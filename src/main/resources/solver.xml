@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+    <!--<environmentMode>FAST_ASSERT</environmentMode> -->
+    <solutionClass>cn.devit.demo.planner.SeatPlan</solutionClass>
+    <entityClass>cn.devit.demo.planner.SeatAssignment</entityClass>
+    <scoreDirectorFactory>
+        <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
+        <easyScoreCalculatorClass>cn.devit.demo.planner.EasyScore</easyScoreCalculatorClass>
+        <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+    </scoreDirectorFactory>
+
+    <termination>
+        <secondsSpentLimit>10</secondsSpentLimit>
+        <bestScoreLimit>0hard/0soft</bestScoreLimit>
+    </termination>
+    <constructionHeuristic>
+        <constructionHeuristicType>FIRST_FIT</constructionHeuristicType>
+    </constructionHeuristic>
+    <localSearch>
+        <changeMoveSelector>
+            <selectionOrder>ORIGINAL</selectionOrder>
+        </changeMoveSelector>
+        <acceptor>
+            <entityTabuSize>5</entityTabuSize>
+        </acceptor>
+        <forager>
+        </forager>
+        <termination>
+          <unimprovedMillisecondsSpentLimit>500</unimprovedMillisecondsSpentLimit>
+        </termination>
+    </localSearch>
+</solver>
