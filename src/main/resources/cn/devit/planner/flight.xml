@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
-    <!--<environmentMode>FAST_ASSERT</environmentMode> -->
-    <solutionClass>cn.devit.planner.FlightSolution</solutionClass>
-    <entityClass>cn.devit.planner.FlightLeg</entityClass>
-    <scoreDirectorFactory>
-        <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
-        <scoreDrl>cn/devit/planner/flight.drl</scoreDrl>
-        <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
-    </scoreDirectorFactory>
+  <!--<environmentMode>FAST_ASSERT</environmentMode> -->
+  <solutionClass>cn.devit.planner.FlightSolution</solutionClass>
+  <entityClass>cn.devit.planner.FlightLeg</entityClass>
+  <scoreDirectorFactory>
+    <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
+    <scoreDrl>cn/devit/planner/flight.drl</scoreDrl>
+    <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+  </scoreDirectorFactory>
 
-    <termination>
-        <secondsSpentLimit>600</secondsSpentLimit>
-        <bestScoreLimit>0hard/0soft</bestScoreLimit>
-    </termination>
-    <constructionHeuristic>
-        <!-- <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType> -->
-        <!-- <constructionHeuristicType>FIRST_FIT</constructionHeuristicType> -->
-        <constructionHeuristicType>ALLOCATE_ENTITY_FROM_QUEUE</constructionHeuristicType>
-    </constructionHeuristic>
-    <localSearch>
-        <changeMoveSelector>
-            <selectionOrder>ORIGINAL</selectionOrder>
-        </changeMoveSelector>
-        <acceptor>
-            <entityTabuSize>20</entityTabuSize>
-        </acceptor>
-        <forager>
-            <acceptedCountLimit>2000</acceptedCountLimit>
-        </forager>
-        <termination>
-          <unimprovedMillisecondsSpentLimit>6000</unimprovedMillisecondsSpentLimit>
-        </termination>
-    </localSearch>
+  <termination>
+    <secondsSpentLimit>600</secondsSpentLimit>
+    <bestScoreLimit>0hard/0soft</bestScoreLimit>
+  </termination>
+  <constructionHeuristic>
+    <!-- <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType> -->
+    <constructionHeuristicType>FIRST_FIT</constructionHeuristicType>
+    <!-- <constructionHeuristicType>ALLOCATE_ENTITY_FROM_QUEUE
+    </constructionHeuristicType> -->
+  </constructionHeuristic>
+  <localSearch>
+    <changeMoveSelector>
+      <selectionOrder>ORIGINAL</selectionOrder>
+    </changeMoveSelector>
+    <acceptor>
+      <!--过大会陷入局部最优 -->
+      <entityTabuSize>20</entityTabuSize>
+      <!--<entityTabuRatio>0.02</entityTabuRatio> -->
+      <!--<lateAcceptanceSize>400</lateAcceptanceSize> -->
+    </acceptor>
+    <forager>
+      <!--越小迭代越快 -->
+      <acceptedCountLimit>10000</acceptedCountLimit>
+    </forager>
+    <!-- <termination>
+      <unimprovedMillisecondsSpentLimit>6000</unimprovedMillisecondsSpentLimit>
+    </termination> -->
+  </localSearch>
 </solver>
