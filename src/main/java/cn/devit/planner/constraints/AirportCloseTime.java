@@ -25,6 +25,23 @@ public class AirportCloseTime {
 
     LocalDate validFrom;
     LocalDate validThru;
+    
+    public Airport getAirport() {
+        return airport;
+    }
+    
+    public LocalTime getCloseTime() {
+        return closeTime;
+    }
+    public LocalTime getOpenTime() {
+        return openTime;
+    }
+    public LocalDate getValidFrom() {
+        return validFrom;
+    }
+    public LocalDate getValidThru() {
+        return validThru;
+    }
 
     public AirportCloseTime(Airport airport, LocalTime closeTime,
             LocalTime openTime, LocalDate validFrom, LocalDate validThru) {

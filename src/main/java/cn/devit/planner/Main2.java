@@ -51,8 +51,9 @@ public class Main2 {
         flightModelTimeTable = excelImport.flightModelTimeTable;
 
         plan.flights = new ArrayList<FlightLeg>(excelImport.toPlan);
-        plan.startLegs = new ArrayList<FlightLeg>(excelImport.startPoints);
+        plan.startLegs = new ArrayList<FlightLeg>();
         plan.startLegs.add(new NullFlightLeg());
+        plan.startLegs.addAll(excelImport.startPoints);
 
         plan.dateRange = dates("2017-05-05", "2017-05-08");
         plan.clocks = clocks();

@@ -23,7 +23,7 @@
             <selectionOrder>ORIGINAL</selectionOrder>
         </changeMoveSelector>
         <acceptor>
-            <entityTabuSize>10</entityTabuSize>
+            <entityTabuSize>20</entityTabuSize>
         </acceptor>
         <forager>
             <acceptedCountLimit>2000</acceptedCountLimit>

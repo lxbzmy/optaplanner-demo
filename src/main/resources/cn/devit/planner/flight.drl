@@ -11,6 +11,7 @@ import cn.devit.planner.FlightLeg;
 import cn.devit.planner.constraints.Effect;
 import cn.devit.planner.constraints.Weather;
 import cn.devit.planner.Airport
+import cn.devit.planner.constraints.AirportCloseTime
 
 global HardSoftScoreHolder scoreHolder;
 
@@ -77,6 +78,7 @@ rule "国际航班时间变动条件是[0,36h]"
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
 
+
 rule "换飞机时指定飞机不能飞指定航段"
     when
         $vol:PlaneLegConstraint($leg:leg ,$plane:plane )
@@ -85,7 +87,38 @@ rule "换飞机时指定飞机不能飞指定航段"
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
 
+/**
+ * 有些机场有关闭时间段
+*/
 
+rule "机场关闭时不能起飞"
+    when
+        $flight : FlightLeg($leg: leg,plane!=null, 
+            $departureDate : departureDateTime.toLocalDate(),
+            $departureTime : departureDateTime.toLocalTime()
+        )
+        AirportCloseTime( airport == $leg.departure,
+            validFrom <= $departureDate,$departureDate<= validThru,
+            closeTime <= $departureTime,$departureTime <= openTime
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+rule "机场关闭时不能降落"
+    when
+        $flight : FlightLeg($leg: leg,plane!= null, 
+            $arrivalDate : arrivalDateTime.toLocalDate(),
+            $arrivalTime : arrivalDateTime.toLocalTime()
+        )
+        AirportCloseTime(airport == $leg.arrival,
+            validFrom <= $arrivalDate,$arrivalDate<= validThru,
+            closeTime <= $arrivalTime,$arrivalTime <= openTime
+            
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
 
 /**
  *=====
