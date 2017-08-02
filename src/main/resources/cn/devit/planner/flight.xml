@@ -10,7 +10,7 @@
   </scoreDirectorFactory>
 
   <termination>
-    <secondsSpentLimit>600</secondsSpentLimit>
+    <secondsSpentLimit>1800</secondsSpentLimit>
     <bestScoreLimit>0hard/0soft</bestScoreLimit>
   </termination>
   <constructionHeuristic>
@@ -33,8 +33,8 @@
       <!--越小迭代越快 -->
       <acceptedCountLimit>10000</acceptedCountLimit>
     </forager>
-    <!-- <termination>
+    <termination>
       <unimprovedMillisecondsSpentLimit>6000</unimprovedMillisecondsSpentLimit>
-    </termination> -->
+    </termination>
   </localSearch>
 </solver>

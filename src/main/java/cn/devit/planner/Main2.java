@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,8 @@ import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 
 import com.csvreader.CsvWriter;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Table;
 import com.google.common.io.ByteStreams;
 
@@ -50,10 +53,28 @@ public class Main2 {
         flightTimeTable = excelImport.flightTimeTable;
         flightModelTimeTable = excelImport.flightModelTimeTable;
 
-        plan.flights = new ArrayList<FlightLeg>(excelImport.toPlan);
+        Collection<FlightLeg> model1_list = Collections2.filter(excelImport.toPlan, new Predicate<FlightLeg>() {
+
+            @Override
+            public boolean apply(FlightLeg input) {
+                return input.plane.model.equals("1");
+            }
+        });
+        
+//        plan.flights = new ArrayList<FlightLeg>(excelImport.toPlan);
+        plan.flights = new ArrayList<FlightLeg>(model1_list);
         plan.startLegs = new ArrayList<FlightLeg>();
         plan.startLegs.add(new NullFlightLeg());
-        plan.startLegs.addAll(excelImport.startPoints);
+        
+        Collection<FlightLeg> model1 = Collections2.filter(excelImport.startPoints, new Predicate<FlightLeg>() {
+
+            @Override
+            public boolean apply(FlightLeg input) {
+                return input.plane.model.equals("1");
+            }
+        });
+//        plan.startLegs.addAll(excelImport.startPoints);
+        plan.startLegs.addAll(model1);
 
         plan.dateRange = dates("2017-05-05", "2017-05-08");
         plan.clocks = clocks();

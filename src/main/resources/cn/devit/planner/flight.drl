@@ -56,6 +56,13 @@ rule "航站衔接"
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
 
+rule "飞机需要停留50分钟才能起飞"
+    when
+        FlightLeg(plane !=null, delayMinutes <50 ,changed == true)
+    then
+        //System.out.println($f2);
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
 
 /**
  * 延误条件，分国内国际

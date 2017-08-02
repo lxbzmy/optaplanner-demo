@@ -198,7 +198,7 @@ public class FlightLeg extends Entity {
         this.departureTime = sc.departureTime;
     }
 
-    boolean changed() {
+    public boolean changed() {
         if (schedule != null && schedule.plane != null
                 && schedule.plane.equals(this.plane)
                 && schedule.departureDate.equals(this.departureDate)
@@ -206,6 +206,14 @@ public class FlightLeg extends Entity {
             return false;
         }
         return true;
+    }
+    
+    public int getStayMinutesBeforeDeparture() {
+        if (previousLeg != null) {
+            return (int) new Duration(getDepartureAirportArrivalTime(),
+                    getDepartureDateTime()).getStandardMinutes();
+        }
+        return Integer.MAX_VALUE;
     }
 
     public DateTime getDepartureAirportArrivalTime() {
