@@ -1,13 +1,9 @@
 package cn.devit.planner;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
-import org.optaplanner.examples.vehiclerouting.domain.Customer;
-import org.optaplanner.examples.vehiclerouting.domain.Standstill;
-import org.optaplanner.examples.vehiclerouting.domain.timewindowed.TimeWindowedCustomer;
 
 public class ArrivalTimeUpdatingVariableListener
         implements VariableListener<FlightLeg> {
@@ -57,7 +53,6 @@ public class ArrivalTimeUpdatingVariableListener
         //查查自己这段的飞行时间。
         FlightLeg leg = flight;
 
-        Duration flyTime = flight.schedule.getFlyTime();
         //        Duration flyTime = Main2.scheduleFlightTimeTable.row(leg.getLeg())
         //                .get(flight.plane);
         //        if (flyTime == null) {
@@ -75,14 +70,14 @@ public class ArrivalTimeUpdatingVariableListener
         //        }
 
         while (flight != null) {
-            scoreDirector.beforeVariableChanged(flight, "flyTime");
-            flight.flyTime = flyTime;
-            scoreDirector.afterVariableChanged(flight, "flyTime");
             arrivalDateTime = flight.getArrivalDateTime();
-
             flight = flight.nextLeg;
             if (flight != null) {
+                scoreDirector.beforeVariableChanged(flight,
+                        "departureAirportArrivalTime");
                 flight.departureAirportArrivalTime = arrivalDateTime;
+                scoreDirector.afterVariableChanged(flight,
+                        "departureAirportArrivalTime");
             }
         }
     }

@@ -26,7 +26,11 @@ public class FlightSchedule2 {
 
     LocalTime arriavalTime;
     LocalDate arriavalDate;
-    
+
+    DateTime arriavalDateTime() {
+        return new DateTime().withDate(arriavalDate).withTime(arriavalTime);
+    }
+
     public DateTime getDepartureDateTime() {
         return new DateTime().withDate(departureDate).withTime(departureTime);
     }

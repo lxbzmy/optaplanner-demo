@@ -11,6 +11,8 @@ import org.joda.time.LocalTime;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
+import org.optaplanner.core.api.domain.valuerange.CountableValueRange;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 import org.optaplanner.core.api.score.Score;
@@ -35,20 +37,11 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
     @ValueRangeProvider(id = "startPoint")
     List<FlightLeg> startLegs;
 
-    Set<LocalDate> dateRange;
-
     Collection<Weather> weathers;
 
-    @ValueRangeProvider(id = "date")
-    public Set<LocalDate> getDateRange() {
-        return dateRange;
-    }
-
-    Set<LocalTime> clocks;
-
-    @ValueRangeProvider(id = "time")
-    public Set<LocalTime> getClocks() {
-        return clocks;
+    @ValueRangeProvider(id = "duration")
+    public CountableValueRange<Integer> getMinutesRange() {
+        return ValueRangeFactory.createIntValueRange(15, 60 * 24 * 3,5);
     }
 
     List<Leg> legs = new ArrayList<Leg>();
@@ -80,8 +73,7 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
 
         //变量
         //日期，时间
-        set.addAll(dateRange);
-        set.addAll(clocks);
+//        set.addAll(getMinutesRange());
         //飞机，航行
         set.addAll(planeLegConstraints);
         //初始锚点

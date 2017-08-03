@@ -46,7 +46,7 @@ rule "前后时间顺序不能乱"
         //System.out.println($f2);
         scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
-
+/*TODO 这个规则不能导致取消。
 rule "航站衔接"
     when
         $left: FlightLeg(plane !=null, $p2 : leg.arrival )
@@ -54,11 +54,11 @@ rule "航站衔接"
     then
         //System.out.println($f2);
         scoreHolder.addHardConstraintMatch(kcontext, -1);
-end
+end*/
 
 rule "飞机需要停留50分钟才能起飞"
     when
-        FlightLeg(plane !=null, delayMinutes <50 ,changed == true)
+        FlightLeg(plane !=null, stayMinutesBeforeDeparture <50 ,changed == true)
     then
         //System.out.println($f2);
         scoreHolder.addHardConstraintMatch(kcontext, -1);
@@ -66,11 +66,12 @@ end
 
 /**
  * 延误条件，分国内国际
+ * TODO 只有受到台风影响才能提前
 */
-rule "国内航班时间变动条件是[-6h ,24h]"
+rule "国内航班时间变动条件是[0 ,24h]"
     when
         $flight : FlightLeg(crossBorder ==false,plane !=null,
-            (delayMinutes <-360 || 1440 < delayMinutes)              
+            (delayMinutes <0 || 1440 < delayMinutes)              
         )
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1);
@@ -162,114 +163,3 @@ rule "台风停机不能在台风之前落地然后等台风过了离港"
     then
         scoreHolder.addHardConstraintMatch(kcontext, -2);
 end
-
-// Lectures: A missing or extra lecture of a course.
-// This hard constraint is build-in: the correct number of Lecture's is created
-
-// Conflicts: Two conflicting lectures in the same period.
-// Three conflicting lectures count as 3 violations: one for each pair.
-/**rule "conflictingLecturesDifferentCourseInSamePeriod"
-    when
-        $courseConflict : CourseConflict($leftCourse : leftCourse, $rightCourse : rightCourse)
-        $leftLecture : Lecture(course == $leftCourse, $period : period, period != null)
-        $rightLecture : Lecture(course == $rightCourse, period == $period, this != $leftLecture)
-    then
-        scoreHolder.addHardConstraintMatch(kcontext, - $courseConflict.getConflictCount());
-end
-rule "conflictingLecturesSameCourseInSamePeriod"
-    when
-        Lecture($leftId : id, $leftCourse : course, $period : period, period != null)
-        Lecture(course == $leftCourse, period == $period, id > $leftId)
-    then
-        scoreHolder.addHardConstraintMatch(kcontext, - (1 + $leftCourse.getCurriculumList().size()));
-end
-
-// RoomOccupancy: Two lectures in the same room at the same period.
-// Any extra lecture in the same period and room counts as one more violation.
-rule "roomOccupancy"
-    when
-        Lecture($leftId : id, period != null, $period : period, room != null, $room : room)
-        // $leftLecture has lowest id of the period+room combo
-        not Lecture(period == $period, room == $room, id < $leftId)
-        // rightLecture has the same period
-        Lecture(period == $period, room == $room, id > $leftId, $rightId : id)
-    then
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
-end
-
-// Availabilities: Each lecture in a period unavailable for that course.
-rule "unavailablePeriodPenalty"
-    when
-        UnavailablePeriodPenalty($course : course, $period : period)
-        Lecture(course == $course, period == $period)
-    then
-        scoreHolder.addHardConstraintMatch(kcontext, -10);
-end
-
-// ############################################################################
-// Soft constraints
-// ############################################################################
-
-// RoomCapacity: For each lecture, the number of students that attend the course should be less or equal
-// than the number of seats of all the rooms that host its lectures.
-// Each student above the capacity counts as 1 point of penalty.
-rule "roomCapacity"
-    when
-        $room : Room($capacity : capacity)
-        Lecture(room == $room, studentSize > $capacity, $studentSize : studentSize)
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext, ($capacity - $studentSize));
-end
-
-// MinimumWorkingDays: The lectures of each course should be spread into a minimum number of days.
-// Each day below the minimum counts as 5 points of penalty.
-rule "minimumWorkingDays"
-    when
-        $course : Course($minWorkingDaySize : minWorkingDaySize)
-        $dayCount : Number(intValue < $minWorkingDaySize) from accumulate(
-            $day : Day()
-            and exists Lecture(course == $course, day == $day),
-            count($day)
-        )
-        // An uninitialized schedule should have no constraints broken
-        exists Lecture(course == $course, period != null)
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext, (($dayCount.intValue() - $minWorkingDaySize) * 5));
-end
-
-// CurriculumCompactness: Lectures belonging to a curriculum should be adjacent
-// to each other (i.e., in consecutive periods).
-// For a given curriculum we account for a violation every time there is one lecture not adjacent
-// to any other lecture within the same day.
-// Each isolated lecture in a curriculum counts as 2 points of penalty.
-rule "curriculumCompactness"
-    when
-        $curriculum : Curriculum()
-
-        Lecture(curriculumList contains $curriculum,
-            $day : day, $timeslotIndex : timeslotIndex, period != null
-        )
-        not Lecture(curriculumList contains $curriculum,
-            day == $day, timeslotIndex == ($timeslotIndex - 1)
-        )
-        not Lecture(curriculumList contains $curriculum,
-            day == $day, timeslotIndex == ($timeslotIndex + 1)
-        )
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext, -2);
-end
-
-// RoomStability: All lectures of a course should be given in the same room.
-// Each distinct room used for the lectures of a course, but the first, counts as 1 point of penalty.
-rule "roomStability"
-    when
-        $course : Course()
-        $roomCount : Number(intValue > 1) from accumulate(
-            $room : Room()
-            and exists Lecture(course == $course, room == $room),
-            count($room)
-        )
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext, -($roomCount.intValue() - 1));
-end
-*/

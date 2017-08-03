@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
@@ -76,9 +77,10 @@ public class Main2 {
 //        plan.startLegs.addAll(excelImport.startPoints);
         plan.startLegs.addAll(model1);
 
-        plan.dateRange = dates("2017-05-05", "2017-05-08");
-        plan.clocks = clocks();
-
+//        plan.dateRange = dates("2017-05-05", "2017-05-08");
+//        plan.clocks = clocks();
+        
+        
         solver.solve(plan);
         plan = solver.getBestSolution();
 
@@ -89,6 +91,7 @@ public class Main2 {
         List<FlightLeg> result = new ArrayList<FlightLeg>();
         result.addAll(plan.startLegs);
         result.addAll(plan.flights);
+        
         saveCsv(result);
     }
 

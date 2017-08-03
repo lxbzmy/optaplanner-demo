@@ -3,7 +3,6 @@ package cn.devit.planner;
 import org.eclipse.jdt.annotation.NonNull;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
@@ -23,7 +22,15 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
  * @author lxb
  *
  */
-@PlanningEntity()
+/**
+ * 
+ * <p>
+ *
+ *
+ * @author lxb
+ *
+ */
+@PlanningEntity(difficultyComparatorClass = FlightLegComparator.class)
 public class FlightLeg extends Entity {
 
     public FlightLeg() {
@@ -66,19 +73,21 @@ public class FlightLeg extends Entity {
         return schedule;
     }
 
-    @PlanningVariable(valueRangeProviderRefs = { "date" })
-    LocalDate departureDate;
+    /**
+     * 在离港机场停留的时间，如果是第一段，那么停留时间算作INT_MAX.
+     */
+    @PlanningVariable(valueRangeProviderRefs = {
+            "duration" }, strengthComparatorClass = IntegerComparator.class)
+    int stayMinutes = 0;
 
-    @PlanningVariable(valueRangeProviderRefs = { "time" })
-    LocalTime departureTime;
-
-    /*
-     * 到达时间根据飞机和航线表计算出来。
+    /**
+     * 到达离港机场的时间
      */
     @CustomShadowVariable(variableListenerClass = ArrivalTimeUpdatingVariableListener.class, sources = {
             @CustomShadowVariable.Source(variableName = "previousLeg") })
-    Duration flyTime;
     DateTime departureAirportArrivalTime;
+
+    Duration flyTime;
 
     FlightLeg previousLeg;
 
@@ -107,11 +116,7 @@ public class FlightLeg extends Entity {
     }
 
     public DateTime getDepartureDateTime() {
-        if (departureDate != null) {
-            return new DateTime().withDate(departureDate)
-                    .withTime(departureTime);
-        }
-        return null;
+        return getDepartureAirportArrivalTime().plusMinutes(stayMinutes);
     }
 
     /**
@@ -155,8 +160,9 @@ public class FlightLeg extends Entity {
         if (sc == null) {
             return null;
         }
+        DateTime departureDateTime = getDepartureDateTime();
         return sc.plane + " "
-                + (sc.departureDate.equals(departureDate) ? ""
+                + (sc.departureDate.equals(departureDateTime.toLocalDate()) ? ""
                         : sc.departureDate + " ")
                 + toString(sc.departureTime) + " " + toString(sc.arriavalTime);
     }
@@ -194,29 +200,36 @@ public class FlightLeg extends Entity {
         this.schedule = sc;
         this.flyTime = sc.getFlyTime();
         this.plane = sc.plane;
-        this.departureDate = sc.departureDate;
-        this.departureTime = sc.departureTime;
+        this.departureAirportArrivalTime = new DateTime()
+                .withDate(sc.departureDate).withTime(sc.departureTime);
     }
 
     public boolean changed() {
         if (schedule != null && schedule.plane != null
                 && schedule.plane.equals(this.plane)
-                && schedule.departureDate.equals(this.departureDate)
-                && schedule.departureTime.equals(this.departureTime)) {
+                && schedule.getDepartureDateTime()
+                        .equals(getDepartureDateTime())) {
             return false;
         }
         return true;
     }
-    
+
     public int getStayMinutesBeforeDeparture() {
-        if (previousLeg != null) {
-            return (int) new Duration(getDepartureAirportArrivalTime(),
-                    getDepartureDateTime()).getStandardMinutes();
-        }
-        return Integer.MAX_VALUE;
+        //        if (previousLeg != null) {
+        //            return (int) new Duration(getDepartureDateTime(),
+        //                    getDepartureAirportArrivalTime()).getStandardMinutes();
+        //        }
+        //        return Integer.MAX_VALUE;
+        return stayMinutes;
     }
 
+    /**
+     * @return 离港机场到达的时间，如果没有前续航段了，就取schedule里面的离港时间。
+     */
     public DateTime getDepartureAirportArrivalTime() {
+        if (departureAirportArrivalTime == null) {
+            return schedule.getDepartureDateTime();
+        }
         return departureAirportArrivalTime;
     }
 

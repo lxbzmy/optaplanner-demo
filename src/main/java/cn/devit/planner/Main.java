@@ -1,7 +1,6 @@
 package cn.devit.planner;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,17 +13,13 @@ import org.joda.time.LocalTime;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 
 import cn.devit.planner.constraints.Effect;
 import cn.devit.planner.constraints.Weather;
-import cn.devit.planner.domain.FlightSchedule;
 import cn.devit.planner.domain.FlightTime;
 
 public class Main {
@@ -83,6 +78,10 @@ public class Main {
         //        f1_leg3_2.previousLeg = f1_leg2_3;
         //        f1_leg2_3.nextLeg = f1_leg3_2;
         f1_leg3_2.previousLeg = f1_leg1_2;
+        f1_leg3_2.departureAirportArrivalTime = f1_leg3_2.schedule.arriavalDateTime();
+        f1_leg3_2.stayMinutes = (int) new Duration(
+                f1_leg1_2.schedule.arriavalDateTime(),
+                f1_leg3_2.schedule.getDepartureDateTime()).getStandardMinutes();
         f1_leg1_2.nextLeg = f1_leg3_2;
         FlightLeg f1_leg2_1 = flight("4", plane1, "CA102", leg_2_1,
                 "2017-10-10T19:40:00", "2017-10-10T22:25:00");
@@ -99,9 +98,6 @@ public class Main {
 
         List<PlaneLegConstraint> cons = new ArrayList<PlaneLegConstraint>();
         plan.planeLegConstraints = cons;
-
-        plan.dateRange = dates("2017-10-10", "2017-10-11");
-        plan.clocks = clocks();
 
         flightTime(plane1, leg_1_2, 55 + 60 + 50);
         flightTime(plane1, leg_2_3, 2 * 60);
@@ -130,8 +126,6 @@ public class Main {
         sc.arriavalTime = new LocalTime(dateTime);
         sc.leg = leg;
         FlightLeg flight = new FlightLeg(id);
-        flight.departureDate = sc.departureDate;
-        flight.departureTime = sc.departureTime;
         flight.flyTime = sc.getFlyTime();
         sc.plane = plane1;
 

@@ -103,7 +103,7 @@ public class ExcelImport {
             flightModelTimeTable.row(sc.leg).put(sc.plane.model,
                     sc.getFlyTime());
         }
-//        System.out.println("航班总数：" + list.size());
+        //        System.out.println("航班总数：" + list.size());
 
         ImmutableListMultimap<Plane, FlightLeg> legsGroupByPlane = Multimaps
                 .index(list, new Function<FlightLeg, Plane>() {
@@ -129,12 +129,18 @@ public class ExcelImport {
 
             FlightLeg flight = iterator.next();
             flight.previousLeg = prev;
+
             startPoints.add(flight);
 
             prev = flight;
             while (iterator.hasNext()) {
                 flight = iterator.next();
                 flight.previousLeg = prev;
+                flight.departureAirportArrivalTime = prev.getArrivalDateTime();
+                flight.stayMinutes = (int) new Duration(
+                        flight.departureAirportArrivalTime,
+                        flight.schedule.getDepartureDateTime())
+                                .getStandardMinutes();
                 prev.nextLeg = flight;
                 prev = flight;
                 toPlan.add(flight);
@@ -143,7 +149,7 @@ public class ExcelImport {
         System.out.println("开始点：" + startPoints.size());
         System.out.println("可以安排的段：" + toPlan.size());
         for (FlightLeg item : startPoints) {
-//            System.out.println(item);
+            //            System.out.println(item);
         }
 
         航线飞机限制(book);
@@ -207,8 +213,8 @@ public class ExcelImport {
             row.getCell(飞行时间).getRawValue();
             Duration minutes = Duration.standardMinutes(
                     (long) row.getCell(飞行时间).getNumericCellValue());
-//            System.out.println("⌛" + leg + " " + mod + " "
-//                    + minutes.getStandardMinutes() + "分钟");
+            //            System.out.println("⌛" + leg + " " + mod + " "
+            //                    + minutes.getStandardMinutes() + "分钟");
             flightTimeTable.row(leg).put(mod, minutes);
         }
 
@@ -248,7 +254,7 @@ public class ExcelImport {
             DateTime time1 = new DateTime(row.getCell(开始时间).getDateCellValue());
             DateTime time2 = new DateTime(row.getCell(结束时间).getDateCellValue());
             Weather weather = new Weather(airport, time1, time2, e);
-//            System.out.println(weather);
+            //            System.out.println(weather);
             weathers.add(weather);
         }
         return weathers;
@@ -287,7 +293,7 @@ public class ExcelImport {
                     openTime, formDate, thruDate);
 
             airportCloseTime.add(close);
-//            System.out.println(close);
+            //            System.out.println(close);
         }
         System.out.println("机场关闭时间数量" + airportCloseTime.size());
         return airportCloseTime;
@@ -313,7 +319,7 @@ public class ExcelImport {
             PlaneLegConstraints.add(new PlaneLegConstraint(plane, leg));
         }
         for (PlaneLegConstraint item : PlaneLegConstraints) {
-//            System.out.println(item);
+            //            System.out.println(item);
         }
         System.out.println("飞机航节限制数量" + PlaneLegConstraints.size());
         return PlaneLegConstraints;

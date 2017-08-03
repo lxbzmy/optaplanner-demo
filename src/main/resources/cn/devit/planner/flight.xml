@@ -14,15 +14,13 @@
     <bestScoreLimit>0hard/0soft</bestScoreLimit>
   </termination>
   <constructionHeuristic>
-    <!-- <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType> -->
-    <constructionHeuristicType>FIRST_FIT</constructionHeuristicType>
-    <!-- <constructionHeuristicType>ALLOCATE_ENTITY_FROM_QUEUE
-    </constructionHeuristicType> -->
+    <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
   </constructionHeuristic>
   <localSearch>
-    <changeMoveSelector>
-      <selectionOrder>ORIGINAL</selectionOrder>
-    </changeMoveSelector>
+    <unionMoveSelector>
+      <changeMoveSelector />
+      <swapMoveSelector />
+    </unionMoveSelector>
     <acceptor>
       <!--过大会陷入局部最优 -->
       <entityTabuSize>20</entityTabuSize>
@@ -30,11 +28,10 @@
       <!--<lateAcceptanceSize>400</lateAcceptanceSize> -->
     </acceptor>
     <forager>
-      <!--越小迭代越快 -->
-      <acceptedCountLimit>10000</acceptedCountLimit>
+      <acceptedCountLimit>100</acceptedCountLimit>
     </forager>
     <termination>
-      <unimprovedMillisecondsSpentLimit>6000</unimprovedMillisecondsSpentLimit>
+      <unimprovedMillisecondsSpentLimit>8000</unimprovedMillisecondsSpentLimit>
     </termination>
   </localSearch>
 </solver>

@@ -8,6 +8,6 @@ public class Airport extends Entity {
 
     @Override
     public String toString() {
-        return "⚓️[" + id + "]";
+        return "⚓" + id;
     }
 }
