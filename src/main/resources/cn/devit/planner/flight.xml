@@ -10,7 +10,8 @@
   </scoreDirectorFactory>
 
   <termination>
-    <secondsSpentLimit>1800</secondsSpentLimit>
+    <!-- <secondsSpentLimit>1800</secondsSpentLimit> -->
+    <minutesSpentLimit>2</minutesSpentLimit>
     <bestScoreLimit>0hard/0soft</bestScoreLimit>
   </termination>
   <constructionHeuristic>
@@ -23,15 +24,16 @@
     </unionMoveSelector>
     <acceptor>
       <!--过大会陷入局部最优 -->
-      <entityTabuSize>20</entityTabuSize>
+      <entityTabuSize>10</entityTabuSize>
       <!--<entityTabuRatio>0.02</entityTabuRatio> -->
-      <!--<lateAcceptanceSize>400</lateAcceptanceSize> -->
+      <!-- 不好使，加上就不动了 -->
+      <!-- <lateAcceptanceSize>10</lateAcceptanceSize> -->
     </acceptor>
     <forager>
       <acceptedCountLimit>100</acceptedCountLimit>
     </forager>
-    <termination>
+    <!-- <termination>
       <unimprovedMillisecondsSpentLimit>8000</unimprovedMillisecondsSpentLimit>
-    </termination>
+    </termination> -->
   </localSearch>
 </solver>

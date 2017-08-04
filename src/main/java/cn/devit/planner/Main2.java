@@ -1,19 +1,16 @@
 package cn.devit.planner;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.regex.Pattern;
 
-import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.optaplanner.core.api.solver.Solver;
@@ -22,13 +19,30 @@ import org.optaplanner.core.api.solver.SolverFactory;
 import com.csvreader.CsvWriter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Table;
 import com.google.common.io.ByteStreams;
 
 import cn.devit.planner.constraints.AirportCloseTime;
 import cn.devit.planner.constraints.Weather;
 
 public class Main2 {
+
+    static Predicate<FlightLeg> filter = new Predicate<FlightLeg>() {
+        /*
+         * 有1,2,3,4,5
+         * 1 容易（很容易就会移动到取消段）
+         * 2 难（
+         * 3 容易
+         * 4 -1
+         * 5 容易
+         * 
+         */
+        Pattern p = Pattern.compile("4");
+
+        @Override
+        public boolean apply(FlightLeg input) {
+            return p.matcher(input.schedule.plane.model).matches();
+        }
+    };
 
     public static void main(String[] args) throws Exception {
 
@@ -50,37 +64,13 @@ public class Main2 {
                 excelImport.PlaneLegConstraints);
         plan.airportCloseTime = new ArrayList<AirportCloseTime>(
                 excelImport.airportCloseTime);
-        scheduleFlightTimeTable = excelImport.scheduleFlightTimeTable;
-        flightTimeTable = excelImport.flightTimeTable;
-        flightModelTimeTable = excelImport.flightModelTimeTable;
 
-        Collection<FlightLeg> model1_list = Collections2.filter(excelImport.toPlan, new Predicate<FlightLeg>() {
-
-            @Override
-            public boolean apply(FlightLeg input) {
-                return input.plane.model.equals("1");
-            }
-        });
-        
-//        plan.flights = new ArrayList<FlightLeg>(excelImport.toPlan);
-        plan.flights = new ArrayList<FlightLeg>(model1_list);
+        plan.flights = new ArrayList<FlightLeg>(
+                Collections2.filter(excelImport.toPlan, filter));
         plan.startLegs = new ArrayList<FlightLeg>();
         plan.startLegs.add(new NullFlightLeg());
-        
-        Collection<FlightLeg> model1 = Collections2.filter(excelImport.startPoints, new Predicate<FlightLeg>() {
-
-            @Override
-            public boolean apply(FlightLeg input) {
-                return input.plane.model.equals("1");
-            }
-        });
-//        plan.startLegs.addAll(excelImport.startPoints);
-        plan.startLegs.addAll(model1);
-
-//        plan.dateRange = dates("2017-05-05", "2017-05-08");
-//        plan.clocks = clocks();
-        
-        
+        plan.startLegs
+                .addAll(Collections2.filter(excelImport.startPoints, filter));
         solver.solve(plan);
         plan = solver.getBestSolution();
 
@@ -91,13 +81,9 @@ public class Main2 {
         List<FlightLeg> result = new ArrayList<FlightLeg>();
         result.addAll(plan.startLegs);
         result.addAll(plan.flights);
-        
+
         saveCsv(result);
     }
-
-    static Table<Leg, Plane, Duration> scheduleFlightTimeTable = null;
-    static Table<Leg, String, Duration> flightTimeTable = null;
-    static Table<Leg, String, Duration> flightModelTimeTable = null;
 
     public static String toString(FlightSolution plan) {
         int count = 1;
@@ -106,9 +92,10 @@ public class Main2 {
             FlightLeg start = item;
             int seq = 1;
             while (start != null) {
-                sb.append(
-                        (start.changed() ? "！" : "") + (count++) + "#" + seq++)
-                        .append(" ").append(start).append("\n");
+                sb.append((start.changed() ? "!" : " "))
+                        .append(String.format("%4d#", count++))
+                        .append(String.format("%4d ", seq++)).append(start)
+                        .append("\n");
                 start = start.nextLeg;
             }
         }
@@ -122,7 +109,7 @@ public class Main2 {
 
         DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         for (FlightLeg item : list) {
-            if(item instanceof NullFlightLeg){
+            if (item instanceof NullFlightLeg) {
                 continue;
             }
             String[] content = new String[9];
@@ -132,11 +119,12 @@ public class Main2 {
             content[3] = format.format(item.getDepartureDateTime().toDate());
 
             content[4] = format.format(item.getArrivalDateTime().toDate());
-            content[5] = item.plane!=null?item.plane.id:item.schedule.plane.id;
+            content[5] = item.plane != null ? item.plane.id
+                    : item.schedule.plane.id;
             //            content[6] = resultFlight.isCancel() ? "1" : "0";
             //            content[7] = resultFlight.isStraighten() ? "1" : "0";
             //            content[8] = resultFlight.isEmptyFly() ? "1" : "0";
-            content[6] = item.plane==null?"1":"0";
+            content[6] = item.plane == null ? "1" : "0";
             content[7] = "0";
             content[8] = "0";
 
@@ -163,31 +151,6 @@ public class Main2 {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    static Set<LocalDate> dates(String from, String to) {
-        LocalDate date = new LocalDate(from);
-        LocalDate dateTo = new LocalDate(to);
-
-        Set<LocalDate> set = new HashSet<LocalDate>(10);
-        while (date.compareTo(dateTo) <= 0) {
-            set.add(date);
-            date = date.plusDays(1);
-        }
-        return set;
-    }
-
-    static Set<LocalTime> clocks() {
-        LocalTime time = new LocalTime(0, 0);
-        LocalTime to = new LocalTime(23, 59);
-
-        Set<LocalTime> set = new HashSet<LocalTime>(10);
-        set.add(time);
-        while (time.compareTo(to) < 0) {
-            time = time.plusMinutes(1);
-            set.add(time);
-        }
-        return set;
     }
 
     public static String toString(List<FlightLeg> legs) {

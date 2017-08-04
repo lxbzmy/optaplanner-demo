@@ -178,8 +178,7 @@ public class FlightLeg extends Entity {
         }
         if (plane == null) {
             return id + " 航班号" + getFlightNumber() + " " + getLeg() + " " + "取消"
-                    + (crossBorder ? "国际" : "国内") + weight + " "
-                    + schedule.departureDate + "，原计划：" + toString(schedule);
+                    + (crossBorder ? "国际" : "国内") + weight + "，原计划：" + toString(schedule);
         }
         return id + " 航班号" + getFlightNumber() + " " + getLeg() + " " + plane
                 + (crossBorder ? "国际" : "国内") + weight + " "
