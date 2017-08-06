@@ -18,6 +18,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
+import cn.devit.planner.Edge.EdgeType;
 import cn.devit.planner.constraints.AirportCloseTime;
 import cn.devit.planner.constraints.Weather;
 
@@ -37,6 +38,15 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
     @ValueRangeProvider(id = "startPoint")
     List<FlightLeg> startLegs;
 
+    /**
+     * 左边界航段，和startLegs内容一样
+     */
+    Edge left = new Edge(EdgeType.left);
+    /**
+     * 保存右边界航段
+     */
+    Edge right = new Edge(EdgeType.right);
+    
     Collection<Weather> weathers;
 
     @ValueRangeProvider(id = "duration")
@@ -78,6 +88,8 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
         set.addAll(planeLegConstraints);
         //初始锚点
         set.addAll(startLegs);
+        set.add(left);
+        set.add(right);
         return set;
 
     }

@@ -12,6 +12,10 @@ import cn.devit.planner.constraints.Effect;
 import cn.devit.planner.constraints.Weather;
 import cn.devit.planner.Airport
 import cn.devit.planner.constraints.AirportCloseTime
+import cn.devit.planner.Edge.EdgeType
+import cn.devit.planner.Edge
+
+global HardSoftScoreHolder scoreHolder;
 
 // ############################################################################
 // 硬性规则
@@ -40,19 +44,18 @@ rule "前后时间顺序不能乱"
     when
         $f1: FlightLeg(plane !=null, $arrivalDateTime: arrivalDateTime)
         $f2: FlightLeg(plane !=null,previousLeg ==$f1, departureDateTime <= $arrivalDateTime)
-    then
-        
+    then        
         System.out.println(kcontext.getRule().getName()+$f2.getId());
 end
-/*TODO 这个规则不能导致取消。
+/*TODO 这个规则可能会导致不能取消。*/
+/*取消以后剩余的航段必须连续，否则需要补充空飞航段*/
 rule "航站衔接"
     when
         $left: FlightLeg(plane !=null, $p2 : leg.arrival )
         $right: FlightLeg(previousLeg ==$left,leg.departure != $p2)
     then
-        //System.out.println($f2);
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
-end*/
+        System.out.println(kcontext.getRule().getName()+$left.getId()+"->"+$right.getId());
+end
 
 rule "飞机需要停留50分钟才能起飞"
     when
@@ -156,7 +159,15 @@ rule "台风停机不能在台风之前落地然后等台风过了离港"
         $leg: Leg(arrival == $airport)
         $flight: FlightLeg(plane !=null,leg ==$leg,arrivalDateTime<= $weather.form) 
         $next : FlightLeg(plane !=null,previousLeg == $flight, 
-            $weather.thru <= departureDateTime)
+        $weather.thru <= departureDateTime)
     then
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
+end
+
+rule "右边界不能取消或者空飞"
+    when 
+        $flight : FlightLeg(plane ==null);
+        $right: Edge(type == EdgeType.right, this contains $flight )
+    then 
         System.out.println(kcontext.getRule().getName()+$flight.getId());
 end

@@ -30,23 +30,34 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 
+import cn.devit.planner.Edge.EdgeType;
 import cn.devit.planner.constraints.AirportCloseTime;
 import cn.devit.planner.constraints.Effect;
 import cn.devit.planner.constraints.Weather;
 
 public class ExcelImport {
 
-    private static final String file = "doc/厦航大赛数据20170705_1.xlsx";
+    public ExcelImport(File filename) {
+        this.file = filename;
+    }
+
+    public ExcelImport() {
+        this(new File("doc/厦航大赛数据20170705_1.xlsx"));
+    }
+
+    File file;
 
     Set<FlightLeg> toPlan = new HashSet<FlightLeg>();
     Set<FlightLeg> startPoints = new HashSet<FlightLeg>();
+    Edge left = new Edge(EdgeType.left);
+    Edge right = new Edge(EdgeType.right);
 
     /**
      * @throws Exception
      */
     @Test
     public void importExcel() throws Exception {
-        XSSFWorkbook book = new XSSFWorkbook(new File(file));
+        XSSFWorkbook book = new XSSFWorkbook(file);
 
         XSSFSheet sheet = book.getSheet("航班");
         //        XSSFRow row = sheet.getRow(0);
@@ -131,6 +142,8 @@ public class ExcelImport {
             flight.previousLeg = prev;
 
             startPoints.add(flight);
+            //每架飞机的左边界航段
+            left.add(flight);
 
             prev = flight;
             while (iterator.hasNext()) {
@@ -145,11 +158,18 @@ public class ExcelImport {
                 prev = flight;
                 toPlan.add(flight);
             }
+            //每架飞机的右边界航段
+            right.add(prev);
         }
         System.out.println("开始点：" + startPoints.size());
         System.out.println("可以安排的段：" + toPlan.size());
-        for (FlightLeg item : startPoints) {
-            //            System.out.println(item);
+        System.out.println("左边界");
+        for (FlightLeg item : left) {
+            System.out.println(item);
+        }
+        System.out.println("右边界");
+        for (FlightLeg item : right) {
+            System.out.println(item);
         }
 
         航线飞机限制(book);

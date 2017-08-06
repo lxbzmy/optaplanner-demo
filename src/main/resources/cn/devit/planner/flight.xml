@@ -42,7 +42,7 @@
     </unionMoveSelector>
     <acceptor>
       <!--过大会陷入局部最优 -->
-      <entityTabuSize>5</entityTabuSize>
+      <entityTabuSize>3</entityTabuSize>
       <!--<entityTabuRatio>0.02</entityTabuRatio> -->
       <!-- 不好使，加上就不动了 -->
       <!-- <lateAcceptanceSize>10</lateAcceptanceSize> -->

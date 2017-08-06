@@ -35,17 +35,20 @@ import cn.devit.planner.constraints.Weather;
 
 public class Main2 {
 
+    static File file = new File("doc/厦航大赛数据_机型1.xlsx");
+
     static Predicate<FlightLeg> filter = new Predicate<FlightLeg>() {
+
         /*
          * 有1,2,3,4,5
-         * 1 容易（很容易就会移动到取消段）
+         * 1 很容易（很容易就会移动到取消段）
          * 2 难（
-         * 3 容易
-         * 4 -1
-         * 5 容易
+         * 3 很容易
+         * 4 容易
+         * 5 很容易
          * 
          */
-        Pattern p = Pattern.compile("4");
+        Pattern p = Pattern.compile("1|3|5");
 
         @Override
         public boolean apply(FlightLeg input) {
@@ -65,14 +68,11 @@ public class Main2 {
      */
     public static void main(String[] args) throws Exception {
 
-        ExcelImport excelImport = new ExcelImport();
+        ExcelImport excelImport = new ExcelImport(file);
         excelImport.importExcel();
 
         // Build the Solver
-        SolverFactory<FlightSolution> solverFactory = SolverFactory
-                .createFromXmlInputStream(
-                        Main2.class.getResourceAsStream("flight.xml"));
-        Solver<FlightSolution> solver = solverFactory.buildSolver();
+        Solver<FlightSolution> solver = solver();
 
         FlightSolution plan = new FlightSolution();
         plan.legs = new ArrayList<Leg>(excelImport.legs.values());
@@ -93,7 +93,10 @@ public class Main2 {
         plan.startLegs
                 .addAll(Collections2.filter(excelImport.startPoints, filter));
         System.out.println("起始点：" + (plan.startLegs.size() - 1));
-        
+        plan.left = excelImport.left;
+        plan.right = excelImport.right;
+
+        debug(plan);
         solver.solve(plan);
         plan = solver.getBestSolution();
 
@@ -110,22 +113,15 @@ public class Main2 {
         debug(plan);
     }
 
-    public static String toString(FlightSolution plan) {
-        int count = 1;
-        StringBuilder sb = new StringBuilder();
-        for (FlightLeg item : plan.startLegs) {
-            FlightLeg start = item;
-            int seq = 1;
-            while (start != null) {
-                sb.append((start.changed() ? "!" : " "))
-                        .append(String.format("%4d#", count++))
-                        .append(String.format("%4d ", seq++)).append(start)
-                        .append("\n");
-                start = start.nextLeg;
-            }
-        }
-        return sb.toString();
+    static Solver<FlightSolution> solver() {
+        SolverFactory<FlightSolution> solverFactory = SolverFactory
+                .createFromXmlInputStream(
+                        Main2.class.getResourceAsStream("flight.xml"));
+        Solver<FlightSolution> solver = solverFactory.buildSolver();
+        return solver;
     }
+
+
 
     public static void saveCsv(List<FlightLeg> list) {
         //数据从2364结束，我从2365开始
@@ -166,9 +162,9 @@ public class Main2 {
 
     static void runScore() {
         try {
-            Process proc = new ProcessBuilder().directory(new File("doc"))
-                    .command("java", "-jar", "XMAEvaluation.jar",
-                            "厦航大赛数据20170705_1.xlsx", "result.csv")
+            Process proc = new ProcessBuilder()
+                    .directory(file.getParentFile()).command("java", "-jar",
+                            "XMAEvaluation.jar", file.getName(), "result.csv")
                     .start();
             InputStream inputStream = proc.getInputStream();
             byte[] byteArray = ByteStreams.toByteArray(inputStream);
@@ -191,15 +187,24 @@ public class Main2 {
         for (Object item : plan.flights) {
             kSession.insert(item);
         }
-        
+
         int count = kSession.fireAllRules();
         System.out.println("触发规则数量" + count);
     }
 
-    public static String toString(List<FlightLeg> legs) {
+    public static String toString(FlightSolution plan) {
+        int count = 1;
         StringBuilder sb = new StringBuilder();
-        for (FlightLeg item : legs) {
-            sb.append(item.toString()).append("\n");
+        for (FlightLeg item : plan.startLegs) {
+            FlightLeg start = item;
+            int seq = 1;
+            while (start != null) {
+                sb.append((start.changed() ? "!" : " "))
+                        .append(String.format("%4d#", count++))
+                        .append(String.format("%4d ", seq++)).append(start)
+                        .append("\n");
+                start = start.nextLeg;
+            }
         }
         return sb.toString();
     }
