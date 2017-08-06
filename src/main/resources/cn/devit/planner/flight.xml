@@ -21,10 +21,28 @@
     <unionMoveSelector>
       <changeMoveSelector />
       <swapMoveSelector />
+      <!-- <subChainChangeMoveSelector>
+        <subChainSelector>
+          <valueSelector>
+            <variableName>previousLeg</variableName>
+          </valueSelector>
+          <minimumSubChainSize>2</minimumSubChainSize>
+          <maximumSubChainSize>45</maximumSubChainSize>
+        </subChainSelector>
+        <valueSelector>
+          <variableName>previousLeg</variableName>
+        </valueSelector>
+        <selectReversingMoveToo>true</selectReversingMoveToo>
+      </subChainChangeMoveSelector> -->
+      <!-- <tailChainSwapMoveSelector>
+        <valueSelector>
+          <variableName>previousLeg</variableName>
+        </valueSelector>
+      </tailChainSwapMoveSelector> -->
     </unionMoveSelector>
     <acceptor>
       <!--过大会陷入局部最优 -->
-      <entityTabuSize>10</entityTabuSize>
+      <entityTabuSize>5</entityTabuSize>
       <!--<entityTabuRatio>0.02</entityTabuRatio> -->
       <!-- 不好使，加上就不动了 -->
       <!-- <lateAcceptanceSize>10</lateAcceptanceSize> -->
