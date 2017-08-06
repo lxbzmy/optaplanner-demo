@@ -13,8 +13,6 @@ import cn.devit.planner.constraints.Weather;
 import cn.devit.planner.Airport
 import cn.devit.planner.constraints.AirportCloseTime
 
-global HardSoftScoreHolder scoreHolder;
-
 // ############################################################################
 // 硬性规则
 // ############################################################################
@@ -43,8 +41,8 @@ rule "前后时间顺序不能乱"
         $f1: FlightLeg(plane !=null, $arrivalDateTime: arrivalDateTime)
         $f2: FlightLeg(plane !=null,previousLeg ==$f1, departureDateTime <= $arrivalDateTime)
     then
-        //System.out.println($f2.getId());
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
+        
+        System.out.println(kcontext.getRule().getName()+$f2.getId());
 end
 /*TODO 这个规则不能导致取消。
 rule "航站衔接"
@@ -60,8 +58,7 @@ rule "飞机需要停留50分钟才能起飞"
     when
         $flight:FlightLeg(plane !=null, stayMinutesBeforeDeparture <50 ,changed == true)
     then
-        //System.out.println($flight.getId());
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 /**
@@ -74,8 +71,7 @@ rule "国内航班时间变动条件是[0 ,24h]"
             (delayMinutes <0 || 1440 < delayMinutes)              
         )
     then
-        //System.out.println($flight.getId());
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 rule "国际航班时间变动条件是[0,36h]"
@@ -84,8 +80,7 @@ rule "国际航班时间变动条件是[0,36h]"
             (delayMinutes < 0 ||  2160 < delayMinutes)             
         )
     then
-        //System.out.println($flight.getId());
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 
@@ -94,8 +89,7 @@ rule "换飞机时指定飞机不能飞指定航段"
         $vol:PlaneLegConstraint($leg:leg ,$plane:plane )
         $flight : FlightLeg(leg==$leg,plane==$plane)
     then
-        //System.out.println($flight.getId());
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 /**
@@ -113,7 +107,7 @@ rule "机场关闭时不能起飞"
             closeTime < $departureTime,$departureTime < openTime
         )
     then
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 rule "机场关闭时不能降落"
@@ -128,7 +122,7 @@ rule "机场关闭时不能降落"
             
         )
     then
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 /**
@@ -140,20 +134,20 @@ rule "台风不能离港"
     when
         $weather :Weather($airport: airport ,affect == Effect.departure)
         $leg: Leg(departure ==$airport )
-        $Flight: FlightLeg(plane !=null,leg ==$leg, 
+        $flight: FlightLeg(plane !=null,leg ==$leg, 
             $weather.form <= departureDateTime && departureDateTime <= $weather.thru)
     then
-        scoreHolder.addHardConstraintMatch(kcontext, -2);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 rule "台风不能落地"
     when
         $weather :Weather( $airport: airport ,affect == Effect.arrival)
         $leg: Leg(arrival == $airport )
-        $Flight: FlightLeg(plane !=null,leg ==$leg, 
+        $flight: FlightLeg(plane !=null,leg ==$leg, 
             $weather.form<= arrivalDateTime && arrivalDateTime <= $weather.thru)
     then
-        scoreHolder.addHardConstraintMatch(kcontext, -2);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end
 
 rule "台风停机不能在台风之前落地然后等台风过了离港"
@@ -164,5 +158,5 @@ rule "台风停机不能在台风之前落地然后等台风过了离港"
         $next : FlightLeg(plane !=null,previousLeg == $flight, 
             $weather.thru <= departureDateTime)
     then
-        scoreHolder.addHardConstraintMatch(kcontext, -2);
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
 end

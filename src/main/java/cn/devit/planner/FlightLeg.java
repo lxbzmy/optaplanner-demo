@@ -3,6 +3,7 @@ package cn.devit.planner;
 import org.eclipse.jdt.annotation.NonNull;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
@@ -118,6 +119,14 @@ public class FlightLeg extends Entity {
     public DateTime getDepartureDateTime() {
         return getDepartureAirportArrivalTime().plusMinutes(stayMinutes);
     }
+    
+    public LocalDate getDepartureDate() {
+        return getDepartureDateTime().toLocalDate();
+    }
+    
+    public LocalTime getDepartureTime() {
+        return getDepartureDateTime().toLocalTime();
+    }
 
     /**
      * 航段
@@ -125,6 +134,12 @@ public class FlightLeg extends Entity {
      */
     public DateTime getArrivalDateTime() {
         return getDepartureDateTime().plus(flyTime);
+    }
+    public LocalDate getArrivalDate() {
+        return getArrivalDateTime().toLocalDate();
+    }
+    public LocalTime getArrivalTime() {
+        return getArrivalDateTime().toLocalTime();
     }
 
     /**

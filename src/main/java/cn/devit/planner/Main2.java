@@ -3,6 +3,7 @@ package cn.devit.planner;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,8 +12,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.drools.core.io.impl.ClassPathResource;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.kie.api.KieServices;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
+import org.kie.internal.KnowledgeBase;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 
@@ -42,8 +51,18 @@ public class Main2 {
         public boolean apply(FlightLeg input) {
             return p.matcher(input.schedule.plane.model).matches();
         }
+
+        @Override
+        public String toString() {
+            return p.toString();
+        }
     };
 
+    /**
+     * 
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
 
         ExcelImport excelImport = new ExcelImport();
@@ -65,12 +84,16 @@ public class Main2 {
         plan.airportCloseTime = new ArrayList<AirportCloseTime>(
                 excelImport.airportCloseTime);
 
+        System.out.println("筛选条件：" + filter);
         plan.flights = new ArrayList<FlightLeg>(
                 Collections2.filter(excelImport.toPlan, filter));
+        System.out.println("飞行段：" + plan.flights.size());
         plan.startLegs = new ArrayList<FlightLeg>();
         plan.startLegs.add(new NullFlightLeg());
         plan.startLegs
                 .addAll(Collections2.filter(excelImport.startPoints, filter));
+        System.out.println("起始点：" + (plan.startLegs.size() - 1));
+        
         solver.solve(plan);
         plan = solver.getBestSolution();
 
@@ -83,6 +106,8 @@ public class Main2 {
         result.addAll(plan.flights);
 
         saveCsv(result);
+
+        debug(plan);
     }
 
     public static String toString(FlightSolution plan) {
@@ -151,6 +176,24 @@ public class Main2 {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static void debug(FlightSolution plan) {
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
+                .newKnowledgeBuilder();
+        kbuilder.add(new ClassPathResource("debug.drl", Main2.class),
+                ResourceType.DRL);
+        KnowledgeBase kbase = kbuilder.newKnowledgeBase();
+        KieSession kSession = kbase.newKieSession();
+        for (Object item : plan.getProblemFacts()) {
+            kSession.insert(item);
+        }
+        for (Object item : plan.flights) {
+            kSession.insert(item);
+        }
+        
+        int count = kSession.fireAllRules();
+        System.out.println("触发规则数量" + count);
     }
 
     public static String toString(List<FlightLeg> legs) {
