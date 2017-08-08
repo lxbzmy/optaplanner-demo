@@ -21,16 +21,6 @@ global HardSoftScoreHolder scoreHolder;
 // 硬性规则
 // ############################################################################
 /*
-rule "不用飞机1"
-    when
-        //$plane:Plane()
-        //$item:PlaneLegConstraint($leg:leg,$plane:plane)
-        $plane:Plane(id =="1")
-        FlightLeg( plane ==$plane )
-    then
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
-end
-*/
 /*
 rule "测试"
     when
@@ -47,7 +37,11 @@ rule "前后时间顺序不能乱"
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1000000);
 end
-/*TODO 这个规则可能会导致不能取消。*/
+/*TODO 这个规则可能会导致不能取消。
+TODO 台风影响的飞机能够提前
+TODO 空飞，调机
+TODO 拉直？？？
+*/
 /*取消以后剩余的航段必须连续，否则需要补充空飞航段*/
 rule "航站衔接"
     when

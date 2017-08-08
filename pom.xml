@@ -65,5 +65,9 @@
       <artifactId>logback-classic</artifactId>
       <version>1.1.5</version>
     </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-benchmark</artifactId>
+    </dependency>
   </dependencies>
 </project>

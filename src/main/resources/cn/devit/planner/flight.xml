@@ -42,13 +42,14 @@
     </unionMoveSelector>
     <acceptor>
       <!--过大会陷入局部最优 -->
-      <entityTabuSize>10</entityTabuSize>
+      <entityTabuSize>200</entityTabuSize>
+      <valueTabuSize>7</valueTabuSize>
       <!--<entityTabuRatio>0.02</entityTabuRatio> -->
       <!-- 不好使，加上就不动了 -->
       <!-- <lateAcceptanceSize>10</lateAcceptanceSize> -->
     </acceptor>
     <forager>
-      <acceptedCountLimit>200</acceptedCountLimit>
+      <acceptedCountLimit>3000</acceptedCountLimit>
     </forager>
     <!-- <termination>
       <unimprovedMillisecondsSpentLimit>8000</unimprovedMillisecondsSpentLimit>
