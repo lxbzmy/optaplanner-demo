@@ -178,3 +178,25 @@ rule "右边界不能取消或者空飞"
         scoreHolder.addHardConstraintMatch(kcontext, -10000);    
 end
 //TODO "左边界不能改变机场"
+
+
+
+
+
+/**
+* 分数优化条件，soft 约束
+* 取消一个航班
+*/
+rule "取消一个航班值1000"
+    when 
+        $flight : FlightLeg(previousLeg !=null,plane ==null)
+    then 
+        scoreHolder.addSoftConstraintMatch(kcontext, -1000);    
+end
+
+rule "延误时间"
+    when 
+        $flight : FlightLeg(plane !=null, delayMinutes >0,$delay :delayMinutes )
+    then 
+        scoreHolder.addSoftConstraintMatch(kcontext, -100 * $delay/60);    
+end
