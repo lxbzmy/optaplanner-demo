@@ -176,7 +176,11 @@ public class ExcelImport {
         机场关闭限制(book);
         台风场景(book);
         飞行时间(book);
-        book.close();
+        try {
+            book.close();
+        } catch (Exception e) {
+            //I Dont care
+        }
     }
 
     /**

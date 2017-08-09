@@ -68,10 +68,10 @@ end
  * 延误条件，分国内国际
  * TODO 只有受到台风影响才能提前
 */
-rule "国内航班时间变动条件是[0 ,24h]"
+rule "国内航班最多延误24h"
     when
         $flight : FlightLeg(crossBorder ==false,plane !=null,
-            (delayMinutes <0 || 1440 < delayMinutes)              
+            1440 < delayMinutes              
         )
     then
         System.out.println(kcontext.getRule().getName()+$flight.getId());
@@ -139,6 +139,36 @@ rule "台风不能离港"
         $leg: Leg(departure ==$airport )
         $flight: FlightLeg(plane !=null,leg ==$leg, 
             $weather.form <= departureDateTime && departureDateTime <= $weather.thru)
+    then
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
+end
+
+rule "没有台风不能提前离港"
+    when
+        $flight : FlightLeg(crossBorder ==false,plane !=null,
+            delayMinutes<0,
+            $airport :leg.departure,
+            $scheduleDepartureDateTime : schedule.departureDateTime
+            )
+        not ( exists 
+            Weather(airport == $airport ,affect == Effect.departure,
+                form <= $scheduleDepartureDateTime && $scheduleDepartureDateTime <= thru
+            ) 
+        )   
+    then
+        System.out.println(kcontext.getRule().getName()+$flight.getId());
+end
+
+rule "被台风影响离港的国内航班允许提前起飞[6,0]"
+    when
+        $flight : FlightLeg(crossBorder ==false,plane !=null,
+            delayMinutes<-360,
+            $airport :leg.departure,
+            $scheduleDepartureDateTime : schedule.departureDateTime
+         )
+         Weather(airport == $airport,affect == Effect.departure,
+                form <= $scheduleDepartureDateTime && $scheduleDepartureDateTime <= thru
+            )
     then
         System.out.println(kcontext.getRule().getName()+$flight.getId());
 end

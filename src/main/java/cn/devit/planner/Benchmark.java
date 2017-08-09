@@ -7,7 +7,7 @@ public class Benchmark {
 
     public static void main(String[] args) {
         PlannerBenchmarkFactory plannerBenchmarkFactory = PlannerBenchmarkFactory
-                .createFromXmlInputStream(
+                .createFromFreemarkerXmlInputStream(
                         Benchmark.class.getResourceAsStream("benchmark.xml"));
         PlannerBenchmark plannerBenchmark = plannerBenchmarkFactory
                 .buildPlannerBenchmark();
