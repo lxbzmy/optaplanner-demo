@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -57,7 +58,8 @@ public class ExcelImport {
      */
     @Test
     public void importExcel() throws Exception {
-        XSSFWorkbook book = new XSSFWorkbook(file);
+        
+        XSSFWorkbook book = (XSSFWorkbook) WorkbookFactory.create(file, null, true);
 
         XSSFSheet sheet = book.getSheet("航班");
         //        XSSFRow row = sheet.getRow(0);

@@ -93,7 +93,11 @@ public class FlightLeg extends Entity {
     FlightLeg previousLeg;
 
     @PlanningVariable(valueRangeProviderRefs = { "changeableLegs",
-            "startPoint" }, graphType = PlanningVariableGraphType.CHAINED)
+            "startPoint" }, 
+            graphType = PlanningVariableGraphType.CHAINED,
+            strengthComparatorClass=FlightLegComparator.class
+            //TODO 次排序是否适合放在这里？
+            )
     public FlightLeg getPreviousLeg() {
         return previousLeg;
     }
