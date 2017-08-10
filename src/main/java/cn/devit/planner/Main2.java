@@ -18,7 +18,7 @@ import com.google.common.io.ByteStreams;
 
 public class Main2 {
 
-    static File file = new File("doc/厦航大赛数据_飞机30.xlsx");
+    static File file = new File("doc/厦航大赛数据_飞机40.xlsx");
 
     /**
      * 

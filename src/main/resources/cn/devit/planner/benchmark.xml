@@ -6,6 +6,7 @@
     <problemBenchmarks>
       <solutionFileIOClass>cn.devit.planner.ImportSolution</solutionFileIOClass>
       <inputSolutionFile>doc/厦航大赛数据_飞机30.xlsx</inputSolutionFile>
+      <inputSolutionFile>doc/厦航大赛数据_飞机40.xlsx</inputSolutionFile>
       <problemStatisticType>STEP_SCORE</problemStatisticType>
     </problemBenchmarks>
     <solver>
@@ -25,7 +26,7 @@
       </constructionHeuristic>
     </solver>
   </inheritedSolverBenchmark>
-<#list [10,20] as entityTabuSize>
+<#list [10,100,300] as entityTabuSize>
 <#list [100,1000,3000] as acceptedCountLimit>
 <#list [7,15] as v>
   <solverBenchmark>
