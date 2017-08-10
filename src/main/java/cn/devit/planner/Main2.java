@@ -3,6 +3,9 @@ package cn.devit.planner;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import org.drools.core.io.impl.ClassPathResource;
 import org.kie.api.io.ResourceType;
@@ -10,8 +13,12 @@ import org.kie.api.runtime.KieSession;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.optaplanner.core.api.score.constraint.ConstraintMatch;
+import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.impl.score.director.ScoreDirector;
+import org.optaplanner.core.impl.score.director.drools.DroolsScoreDirector;
 
 import com.google.common.io.ByteStreams;
 
@@ -35,7 +42,8 @@ public class Main2 {
         ImportSolution importSolution = new ImportSolution();
         FlightSolution plan = (FlightSolution) importSolution.read(file);
 
-        debug(plan);
+        debug(solver, plan);
+
         solver.solve(plan);
         plan = solver.getBestSolution();
 
@@ -45,7 +53,39 @@ public class Main2 {
 
         importSolution.write(plan, new File("doc/result.csv"));
         runScore();
-        debug(plan);
+        debug(solver, plan);
+
+    }
+
+    final static int LV_HARD = 0;
+    final int LV_SOFT = 1;
+
+    static void debug(Solver<FlightSolution> solver, FlightSolution plan) {
+        Log.d("===违规项目调试===");
+        DroolsScoreDirector scoreDirector = (DroolsScoreDirector) solver
+                .getScoreDirectorFactory().buildScoreDirector();
+        scoreDirector.setWorkingSolution(plan);
+        scoreDirector.calculateScore();
+        Collection<ConstraintMatchTotal> inv = scoreDirector
+                .getConstraintMatchTotals();
+        for (ConstraintMatchTotal item : inv) {
+            if (item.getScoreLevel() == LV_HARD) {
+                Log.d("项目：" + item.getConstraintName());
+
+                Set<? extends ConstraintMatch> vo = item
+                        .getConstraintMatchSet();
+                int i = 1;
+                for (ConstraintMatch match : vo) {
+                    Log.d("#{}", i++);
+                    List<Object> list = match.getJustificationList();
+                    for (Object object : list) {
+                        System.out.println(object);
+                    }
+
+                }
+            }
+        }
+        System.out.println("================");
     }
 
     static void runScore() {
