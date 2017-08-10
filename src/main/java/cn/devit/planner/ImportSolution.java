@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.persistence.common.api.domain.solution.SolutionFileIO;
 
@@ -18,7 +17,7 @@ import com.google.common.collect.Collections2;
 import cn.devit.planner.constraints.AirportCloseTime;
 import cn.devit.planner.constraints.Weather;
 
-public class ImportSolution implements SolutionFileIO {
+public class ImportSolution implements SolutionFileIO<FlightSolution> {
 
     @Override
     public String getInputFileExtension() {
@@ -55,7 +54,7 @@ public class ImportSolution implements SolutionFileIO {
     };
 
     @Override
-    public Solution<?> read(File file) {
+    public FlightSolution read(File file) {
 
         ExcelImport excelImport = new ExcelImport(file);
         try {
@@ -91,7 +90,7 @@ public class ImportSolution implements SolutionFileIO {
     }
 
     @Override
-    public void write(Solution solution, File arg1) {
+    public void write(FlightSolution solution, File arg1) {
 
         FlightSolution plan = (FlightSolution) solution;
         List<FlightLeg> result = new ArrayList<FlightLeg>();

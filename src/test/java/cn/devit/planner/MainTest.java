@@ -16,6 +16,11 @@ import com.google.common.io.ByteStreams;
 public class MainTest {
 
     @Test
+    public void testName() throws Exception {
+        System.out.println(org.optaplanner.core.api.domain.solution.Solution.class);
+    }
+    
+    @Test
     public void 每分钟() throws Exception {
         Set<LocalTime> clocks = Main.clocks();
         System.out.println(clocks);

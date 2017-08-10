@@ -7,18 +7,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.drools.core.io.impl.ClassPathResource;
-import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.KieSession;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.constraint.ConstraintMatch;
 import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
-import org.optaplanner.core.impl.score.director.drools.DroolsScoreDirector;
 
 import com.google.common.io.ByteStreams;
 
@@ -62,14 +56,15 @@ public class Main2 {
 
     static void debug(Solver<FlightSolution> solver, FlightSolution plan) {
         Log.d("===违规项目调试===");
-        DroolsScoreDirector scoreDirector = (DroolsScoreDirector) solver
+        ScoreDirector<FlightSolution> scoreDirector = solver
                 .getScoreDirectorFactory().buildScoreDirector();
         scoreDirector.setWorkingSolution(plan);
         scoreDirector.calculateScore();
         Collection<ConstraintMatchTotal> inv = scoreDirector
                 .getConstraintMatchTotals();
         for (ConstraintMatchTotal item : inv) {
-            if (item.getScoreLevel() == LV_HARD) {
+            HardSoftScore s = (HardSoftScore) item.getScoreTotal();
+            if (s.getHardScore() != 0) {
                 Log.d("项目：" + item.getConstraintName());
 
                 Set<? extends ConstraintMatch> vo = item
@@ -100,24 +95,6 @@ public class Main2 {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    static void debug(FlightSolution plan) {
-        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
-                .newKnowledgeBuilder();
-        kbuilder.add(new ClassPathResource("debug.drl", Main2.class),
-                ResourceType.DRL);
-        KnowledgeBase kbase = kbuilder.newKnowledgeBase();
-        KieSession kSession = kbase.newKieSession();
-        for (Object item : plan.getProblemFacts()) {
-            kSession.insert(item);
-        }
-        for (Object item : plan.flights) {
-            kSession.insert(item);
-        }
-
-        int count = kSession.fireAllRules();
-        System.out.println("触发规则数量" + count);
     }
 
     public static String toString(FlightSolution plan) {

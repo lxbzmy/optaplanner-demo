@@ -11,6 +11,7 @@ import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
+import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 
 /**
  * 航班,按照航节表示的。
@@ -79,13 +80,13 @@ public class FlightLeg extends Entity {
      */
     @PlanningVariable(valueRangeProviderRefs = {
             "duration" }, strengthComparatorClass = IntegerComparator.class)
-    int stayMinutes = 0;
+    Integer stayMinutes = 0;
 
     /**
      * 到达离港机场的时间
      */
     @CustomShadowVariable(variableListenerClass = ArrivalTimeUpdatingVariableListener.class, sources = {
-            @CustomShadowVariable.Source(variableName = "previousLeg") })
+            @PlanningVariableReference(variableName = "previousLeg") })
     DateTime departureAirportArrivalTime;
 
     Duration flyTime;
@@ -93,11 +94,9 @@ public class FlightLeg extends Entity {
     FlightLeg previousLeg;
 
     @PlanningVariable(valueRangeProviderRefs = { "changeableLegs",
-            "startPoint" }, 
-            graphType = PlanningVariableGraphType.CHAINED,
-            strengthComparatorClass=FlightLegComparator.class
-            //TODO 次排序是否适合放在这里？
-            )
+            "startPoint" }, graphType = PlanningVariableGraphType.CHAINED, strengthComparatorClass = FlightLegComparator.class
+    //TODO 次排序是否适合放在这里？
+    )
     public FlightLeg getPreviousLeg() {
         return previousLeg;
     }
@@ -123,11 +122,11 @@ public class FlightLeg extends Entity {
     public DateTime getDepartureDateTime() {
         return getDepartureAirportArrivalTime().plusMinutes(stayMinutes);
     }
-    
+
     public LocalDate getDepartureDate() {
         return getDepartureDateTime().toLocalDate();
     }
-    
+
     public LocalTime getDepartureTime() {
         return getDepartureDateTime().toLocalTime();
     }
@@ -139,9 +138,11 @@ public class FlightLeg extends Entity {
     public DateTime getArrivalDateTime() {
         return getDepartureDateTime().plus(flyTime);
     }
+
     public LocalDate getArrivalDate() {
         return getArrivalDateTime().toLocalDate();
     }
+
     public LocalTime getArrivalTime() {
         return getArrivalDateTime().toLocalTime();
     }
@@ -197,7 +198,8 @@ public class FlightLeg extends Entity {
         }
         if (plane == null) {
             return id + " 航班号" + getFlightNumber() + " " + getLeg() + " " + "取消"
-                    + (crossBorder ? "国际" : "国内") + weight + "，原计划：" + toString(schedule);
+                    + (crossBorder ? "国际" : "国内") + weight + "，原计划："
+                    + toString(schedule);
         }
         return id + " 航班号" + getFlightNumber() + " " + getLeg() + " " + plane
                 + (crossBorder ? "国际" : "国内") + weight + " "

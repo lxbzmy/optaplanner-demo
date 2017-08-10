@@ -15,7 +15,7 @@
         <groupId>org.optaplanner</groupId>
         <artifactId>optaplanner-bom</artifactId>
         <type>pom</type>
-        <version>6.4.0.Final</version>
+        <version>7.0.0.Final</version>
         <scope>import</scope>
       </dependency>
     </dependencies>
