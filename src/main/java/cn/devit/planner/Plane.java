@@ -1,5 +1,11 @@
 package cn.devit.planner;
 
+
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
+
+import cn.devit.planner.domain.AnchorPoint;
+
 /**
  * 飞机
  * <p>
@@ -8,7 +14,8 @@ package cn.devit.planner;
  * @author lxb
  *
  */
-public class Plane extends Entity {
+@PlanningEntity
+public class Plane extends AnchorPoint {
 
     /**
      * 机型，机型衡量载客能力。
@@ -30,7 +37,11 @@ public class Plane extends Entity {
 
     @Override
     public String toString() {
-        return "✈️[" + id +" M" +model+"]";
+        return "✈️[" + id + " M" + model + "]";
     }
 
+    @Override
+    public Plane getPlane() {
+        return this;
+    }
 }

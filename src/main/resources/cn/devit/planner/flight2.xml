@@ -63,7 +63,7 @@
       <!-- <lateAcceptanceSize>10</lateAcceptanceSize> -->
     </acceptor>
     <forager>
-      <acceptedCountLimit>100</acceptedCountLimit>
+      <acceptedCountLimit>3000</acceptedCountLimit>
     </forager>
     <!-- <termination>
       <unimprovedMillisecondsSpentLimit>8000</unimprovedMillisecondsSpentLimit>

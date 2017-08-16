@@ -10,7 +10,7 @@ package cn.devit.planner;
  */
 public abstract class Entity {
 
-    String id;
+    protected String id;
     
     public void setId(String id) {
         this.id = id.trim();

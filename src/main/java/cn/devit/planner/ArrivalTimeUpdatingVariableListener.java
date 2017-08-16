@@ -41,7 +41,10 @@ public class ArrivalTimeUpdatingVariableListener
     protected void updateArrivalTime(ScoreDirector scoreDirector,
             FlightLeg flight) {
 
-        FlightLeg prevLeg = flight.previousLeg;
+        FlightLeg prevLeg = null ;
+        if(flight.previousLeg instanceof FlightLeg) {
+            prevLeg = (FlightLeg) flight.previousLeg;
+        }
         DateTime arrivalDateTime;
         if (prevLeg == null || prevLeg.plane == null) {
             //飞机飞行的第一个航段，用自己的到港机场时间算作到港时间。
@@ -78,6 +81,12 @@ public class ArrivalTimeUpdatingVariableListener
                 flight.departureAirportArrivalTime = arrivalDateTime;
                 scoreDirector.afterVariableChanged(flight,
                         "departureAirportArrivalTime");
+                
+                scoreDirector.beforeVariableChanged(flight,
+                        "stayMinutes");
+                flight.stayMinutes = (int) new Duration(flight.getDepartureAirportArrivalTime(),flight.schedule.getDepartureDateTime()).getStandardMinutes();
+                scoreDirector.afterVariableChanged(flight,
+                        "stayMinutes");
             }
         }
     }

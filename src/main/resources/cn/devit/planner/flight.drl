@@ -3,7 +3,7 @@ dialect "java"
 
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 
-import cn.devit.planner.PlaneLegConstraint;
+import cn.devit.planner.constraints.PlaneLegConstraint;
 import cn.devit.planner.Plane;
 import cn.devit.planner.Leg;
 import cn.devit.planner.FlightPlan;
@@ -30,6 +30,7 @@ rule "测试"
 end
 */
 /* 常理 */
+/*没用，链式的时间顺序会自动调整的。
 rule "前后时间顺序不能乱"
     when
         $f1: FlightLeg(plane !=null, $arrivalDateTime: arrivalDateTime)
@@ -37,16 +38,21 @@ rule "前后时间顺序不能乱"
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1000000);
 end
+*/
 /*TODO 这个规则可能会导致不能取消。
 TODO 台风影响的飞机能够提前
 TODO 空飞，调机
 TODO 拉直？？？
 */
 /*取消以后剩余的航段必须连续，否则需要补充空飞航段*/
-rule "航站衔接"
+rule "航站要衔接但允许空飞调机"
     when
-        $left: FlightLeg(plane !=null, $p2 : leg.arrival )
-        $right: FlightLeg(previousLeg ==$left,leg.departure != $p2)
+        $left: FlightLeg(plane !=null, $p1 : leg.arrival )
+        $right: FlightLeg(previousLeg ==$left,
+            leg.departure != $p1,$p2:leg.departure,
+            $p:plane
+            )
+        PlaneLegConstraint( leg.departure==$p1 , leg.arrival== $p2 , plane == $p )
     then
         scoreHolder.addHardConstraintMatch(kcontext, -100);
 end
@@ -224,4 +230,14 @@ rule "延误时间"
         $flight : FlightLeg(plane !=null, delayMinutes >0,$delay :delayMinutes )
     then 
         scoreHolder.addSoftConstraintMatch(kcontext, -100 * $delay/60);    
+end
+
+rule "需要调机"
+    when
+        $left: FlightLeg(plane !=null, $p1 : leg.arrival )
+        $right: FlightLeg(previousLeg ==$left,
+            leg.departure != $p1
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -5000);
 end

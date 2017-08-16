@@ -16,6 +16,8 @@ import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import com.google.common.io.ByteStreams;
 
+import cn.devit.planner.domain.AnchorPoint;
+
 public class Main2 {
 
     static File file = new File("doc/厦航大赛数据_飞机40.xlsx");
@@ -53,6 +55,25 @@ public class Main2 {
 
     final static int LV_HARD = 0;
     final int LV_SOFT = 1;
+
+    static void 填补空飞(Solver<FlightSolution> solver, FlightSolution plan) {
+        ScoreDirector<FlightSolution> scoreDirector = solver
+                .getScoreDirectorFactory().buildScoreDirector();
+        scoreDirector.setWorkingSolution(plan);
+        scoreDirector.calculateScore();
+        Collection<ConstraintMatchTotal> inv = scoreDirector
+                .getConstraintMatchTotals();
+        for (ConstraintMatchTotal item : inv) {
+            if ("需要调机".equals(item.getConstraintName())) {
+                Set<? extends ConstraintMatch> set = item
+                        .getConstraintMatchSet();
+                for (ConstraintMatch ii : set) {
+                    List<Object> justificationList = ii.getJustificationList();
+//                    FlightLeg FlightLeg = justificationList.get(0);
+                }
+            }
+        }
+    }
 
     static void debug(Solver<FlightSolution> solver, FlightSolution plan) {
         Log.d("===违规项目调试===");
@@ -100,15 +121,19 @@ public class Main2 {
     public static String toString(FlightSolution plan) {
         int count = 1;
         StringBuilder sb = new StringBuilder();
-        for (FlightLeg item : plan.startLegs) {
-            FlightLeg start = item;
-            int seq = 1;
-            while (start != null) {
-                sb.append((start.changed() ? "!" : " "))
-                        .append(String.format("%4d#", count++))
-                        .append(String.format("%4d ", seq++)).append(start)
-                        .append("\n");
-                start = start.nextLeg;
+        List<AnchorPoint> anchors = plan.anchors;
+        for (FlightLeg f : plan.flights) {
+            if(!(f.getPreviousLeg() instanceof FlightLeg)){
+                sb.append(f.getPreviousLeg());
+                FlightLeg start = f;
+                int seq = 1;
+                while (start != null) {
+                    sb.append((start.changed() ? "!" : " "))
+                    .append(String.format("%4d#", count++))
+                    .append(String.format("%4d ", seq++)).append(start)
+                    .append("\n");
+                    start = start.nextLeg;
+                }
             }
         }
         return sb.toString();

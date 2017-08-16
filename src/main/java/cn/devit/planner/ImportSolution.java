@@ -6,16 +6,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import org.optaplanner.core.api.domain.solution.Solution;
+
 import org.optaplanner.persistence.common.api.domain.solution.SolutionFileIO;
 
 import com.csvreader.CsvWriter;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 
 import cn.devit.planner.constraints.AirportCloseTime;
+import cn.devit.planner.constraints.PlaneLegConstraint;
 import cn.devit.planner.constraints.Weather;
+import cn.devit.planner.domain.AnchorPoint;
+import cn.devit.planner.domain.Cancel;
 
 public class ImportSolution implements SolutionFileIO<FlightSolution> {
 
@@ -28,30 +28,6 @@ public class ImportSolution implements SolutionFileIO<FlightSolution> {
     public String getOutputFileExtension() {
         return "csv";
     }
-
-    static Predicate<FlightLeg> filter = new Predicate<FlightLeg>() {
-
-        /*
-         * 有1,2,3,4,5
-         * 1 很容易（很容易就会移动到取消段）
-         * 2 难（
-         * 3 很容易
-         * 4 容易
-         * 5 很容易
-         * 
-         */
-        Pattern p = Pattern.compile("1|3|5");
-
-        @Override
-        public boolean apply(FlightLeg input) {
-            return p.matcher(input.schedule.plane.model).matches();
-        }
-
-        @Override
-        public String toString() {
-            return p.toString();
-        }
-    };
 
     @Override
     public FlightSolution read(File file) {
@@ -73,15 +49,17 @@ public class ImportSolution implements SolutionFileIO<FlightSolution> {
         plan.airportCloseTime = new ArrayList<AirportCloseTime>(
                 excelImport.airportCloseTime);
 
-        System.out.println("筛选条件：" + filter);
-        plan.flights = new ArrayList<FlightLeg>(
-                Collections2.filter(excelImport.toPlan, filter));
+        plan.flights = new ArrayList<FlightLeg>(excelImport.toPlan);
         System.out.println("飞行段：" + plan.flights.size());
-        plan.startLegs = new ArrayList<FlightLeg>();
-        plan.startLegs.add(new NullFlightLeg());
-        plan.startLegs
-                .addAll(Collections2.filter(excelImport.startPoints, filter));
-        System.out.println("起始点：" + (plan.startLegs.size() - 1));
+        
+        ArrayList<AnchorPoint> anchors = new ArrayList<AnchorPoint>();
+        for (FlightLeg item : excelImport.left) {
+            anchors.add(item.plane);
+        }
+        anchors.add(new Cancel());
+        plan.anchors = anchors;
+
+        System.out.println("起始点：" + (excelImport.left.size()));
         plan.left = excelImport.left;
         plan.right = excelImport.right;
 
@@ -94,7 +72,6 @@ public class ImportSolution implements SolutionFileIO<FlightSolution> {
 
         FlightSolution plan = (FlightSolution) solution;
         List<FlightLeg> result = new ArrayList<FlightLeg>();
-        result.addAll(plan.startLegs);
         result.addAll(plan.flights);
         //数据从2364结束，我从2365开始
         int seq = 2365;
@@ -102,9 +79,6 @@ public class ImportSolution implements SolutionFileIO<FlightSolution> {
 
         DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         for (FlightLeg item : result) {
-            if (item instanceof NullFlightLeg) {
-                continue;
-            }
             String[] content = new String[9];
             content[0] = item.id;
             content[1] = item.schedule.leg.departure.id;

@@ -34,6 +34,7 @@ import com.google.common.collect.Tables;
 import cn.devit.planner.Edge.EdgeType;
 import cn.devit.planner.constraints.AirportCloseTime;
 import cn.devit.planner.constraints.Effect;
+import cn.devit.planner.constraints.PlaneLegConstraint;
 import cn.devit.planner.constraints.Weather;
 
 public class ExcelImport {
@@ -49,7 +50,7 @@ public class ExcelImport {
     File file;
 
     Set<FlightLeg> toPlan = new HashSet<FlightLeg>();
-    Set<FlightLeg> startPoints = new HashSet<FlightLeg>();
+//    Set<FlightLeg> startPoints = new HashSet<FlightLeg>();
     Edge left = new Edge(EdgeType.left);
     Edge right = new Edge(EdgeType.right);
 
@@ -140,17 +141,21 @@ public class ExcelImport {
             Iterator<FlightLeg> iterator = sorted.iterator();
             FlightLeg prev = null;
 
+            //设置第一个航段的锚为飞机
             FlightLeg flight = iterator.next();
             flight.previousLeg = prev;
+            
+            flight.setPreviousLeg(flight.plane);
 
-            startPoints.add(flight);
+//            startPoints.add(flight);
             //每架飞机的左边界航段
             left.add(flight);
-
+            toPlan.add(flight);
             prev = flight;
             while (iterator.hasNext()) {
                 flight = iterator.next();
                 flight.previousLeg = prev;
+                flight.setPreviousLeg(prev);
                 flight.departureAirportArrivalTime = prev.getArrivalDateTime();
                 flight.stayMinutes = (int) new Duration(
                         flight.departureAirportArrivalTime,
@@ -163,7 +168,7 @@ public class ExcelImport {
             //每架飞机的右边界航段
             right.add(prev);
         }
-        System.out.println("开始点：" + startPoints.size());
+//        System.out.println("开始点：" + startPoints.size());
         System.out.println("可以安排的段：" + toPlan.size());
         System.out.println("左边界");
         for (FlightLeg item : left) {

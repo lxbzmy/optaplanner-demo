@@ -6,12 +6,16 @@ import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
+
+import cn.devit.planner.domain.AnchorPoint;
+import cn.devit.planner.domain.Cancel;
 
 /**
  * 航班,按照航节表示的。
@@ -33,13 +37,19 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
  *
  */
 @PlanningEntity(difficultyComparatorClass = FlightLegComparator.class)
-public class FlightLeg extends Entity {
+public class FlightLeg extends AnchorPoint {
 
     public FlightLeg() {
     }
 
     public FlightLeg(String id) {
         setId(id);
+    }
+
+    @PlanningId
+    @Override
+    public String getId() {
+        return super.getId();
     }
 
     public String getFlightNumber() {
@@ -78,8 +88,10 @@ public class FlightLeg extends Entity {
     /**
      * 在离港机场停留的时间，如果是第一段，那么停留时间算作INT_MAX.
      */
-    @PlanningVariable(valueRangeProviderRefs = {
-            "duration" }, strengthComparatorClass = IntegerComparator.class)
+    //    @PlanningVariable(valueRangeProviderRefs = {
+    //            "duration" }, strengthComparatorClass = IntegerComparator.class)
+    @CustomShadowVariable(variableListenerClass = ArrivalTimeUpdatingVariableListener.class, sources = {
+            @PlanningVariableReference(variableName = "previousLeg") })
     Integer stayMinutes = 0;
 
     /**
@@ -91,24 +103,43 @@ public class FlightLeg extends Entity {
 
     Duration flyTime;
 
-    FlightLeg previousLeg;
+    AnchorPoint previousLeg;
+
+    //    public void setPreviousPoint(AnchorPoint point) {
+    //        this.previousPoint = point;
+    //        if(point instanceof FlightLeg) {
+    //            this.setPreviousLeg((FlightLeg) point);
+    //        }
+    //    }
+    //    
+    //    public AnchorPoint getPreviousPoint() {
+    //        return previousPoint;
+    //    }
 
     @PlanningVariable(valueRangeProviderRefs = { "changeableLegs",
-            "startPoint" }, graphType = PlanningVariableGraphType.CHAINED, strengthComparatorClass = FlightLegComparator.class
+            "startPoint" }, graphType = PlanningVariableGraphType.CHAINED, strengthComparatorClass = FlightLegComparator.class)
     //TODO 次排序是否适合放在这里？
-    )
-    public FlightLeg getPreviousLeg() {
+    public AnchorPoint getPreviousLeg() {
         return previousLeg;
     }
 
-    public void setPreviousLeg(FlightLeg previousLeg) {
+    public void setPreviousLeg(AnchorPoint previousLeg) {
         this.previousLeg = previousLeg;
     }
 
     Plane plane;
 
-    @InverseRelationShadowVariable(sourceVariableName = "previousLeg")
+    //    @InverseRelationShadowVariable(sourceVariableName = "previousLeg")
     FlightLeg nextLeg;
+
+    @Override
+    public FlightLeg getNextFlight() {
+        return nextLeg;
+    }
+
+    public void setNextFlight(FlightLeg nextLeg) {
+        this.nextLeg = nextLeg;
+    }
 
     /**
      * 重要系数。
@@ -158,15 +189,20 @@ public class FlightLeg extends Entity {
      * @return the plane
      */
     @AnchorShadowVariable(sourceVariableName = "previousLeg")
-    public Plane getPlane() {
+    @Override
+    public AnchorPoint getPlane() {
         return plane;
     }
 
     /**
      * @param plane the plane prevPoint set
      */
-    public void setPlane(Plane plane) {
-        this.plane = plane;
+    public void setPlane(AnchorPoint plane) {
+        if (plane instanceof Plane) {
+            this.plane = (Plane) plane;
+        }else {
+            this.plane = null;
+        }
     }
 
     String toString(DateTime dateTime) {

@@ -20,7 +20,9 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 import cn.devit.planner.Edge.EdgeType;
 import cn.devit.planner.constraints.AirportCloseTime;
+import cn.devit.planner.constraints.PlaneLegConstraint;
 import cn.devit.planner.constraints.Weather;
+import cn.devit.planner.domain.AnchorPoint;
 
 @PlanningSolution
 public class FlightSolution implements Solution<Score<HardSoftScore>> {
@@ -32,12 +34,10 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
     @ValueRangeProvider(id = "changeableLegs")
     List<FlightLeg> flights;
 
-    /**
-     * 记录每个飞机的起始航段。
-     */
+    
     @ValueRangeProvider(id = "startPoint")
-    List<FlightLeg> startLegs;
-
+    List<AnchorPoint> anchors;
+    
     /**
      * 左边界航段，和startLegs内容一样
      */
@@ -87,7 +87,7 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
         //飞机，航行
         set.addAll(planeLegConstraints);
         //初始锚点
-        set.addAll(startLegs);
+        set.addAll(anchors);
         set.add(left);
         set.add(right);
         return set;

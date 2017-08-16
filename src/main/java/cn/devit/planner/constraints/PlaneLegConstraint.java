@@ -1,4 +1,7 @@
-package cn.devit.planner;
+package cn.devit.planner.constraints;
+
+import cn.devit.planner.Leg;
+import cn.devit.planner.Plane;
 
 /**
  * 有些飞机受到到能力限制（年限，航程，气候）不能飞指定的航段

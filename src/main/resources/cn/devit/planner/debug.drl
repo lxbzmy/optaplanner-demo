@@ -3,7 +3,7 @@ dialect "java"
 
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 
-import cn.devit.planner.PlaneLegConstraint;
+import cn.devit.planner.constraints.PlaneLegConstraint;
 import cn.devit.planner.Plane;
 import cn.devit.planner.Leg;
 import cn.devit.planner.FlightPlan;

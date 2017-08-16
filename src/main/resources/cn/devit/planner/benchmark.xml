@@ -2,6 +2,8 @@
 <plannerBenchmark>
   <benchmarkDirectory>target/temp</benchmarkDirectory>
   <parallelBenchmarkCount>AUTO</parallelBenchmarkCount>
+  <warmUpSecondsSpentLimit>30</warmUpSecondsSpentLimit>
+  <!-- <writeOutputSolutionEnabled>true</writeOutputSolutionEnabled> -->
   <inheritedSolverBenchmark>
     <problemBenchmarks>
       <solutionFileIOClass>cn.devit.planner.ImportSolution</solutionFileIOClass>
