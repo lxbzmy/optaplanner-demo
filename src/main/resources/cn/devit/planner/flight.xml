@@ -2,6 +2,7 @@
 <solver>
   <!--<environmentMode>FAST_ASSERT</environmentMode> -->
   <solutionClass>cn.devit.planner.FlightSolution</solutionClass>
+  <entityClass>cn.devit.planner.domain.AnchorPoint</entityClass>
   <entityClass>cn.devit.planner.FlightLeg</entityClass>
   <scoreDirectorFactory>
     <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>

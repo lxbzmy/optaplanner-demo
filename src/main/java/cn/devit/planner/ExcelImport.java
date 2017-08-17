@@ -146,6 +146,7 @@ public class ExcelImport {
             flight.previousLeg = prev;
             
             flight.setPreviousLeg(flight.plane);
+            flight.plane.setNextFlight(flight);
 
 //            startPoints.add(flight);
             //每架飞机的左边界航段
@@ -161,7 +162,8 @@ public class ExcelImport {
                         flight.departureAirportArrivalTime,
                         flight.schedule.getDepartureDateTime())
                                 .getStandardMinutes();
-                prev.nextLeg = flight;
+//                prev.nextLeg = flight;
+                prev.setNextFlight(flight);
                 prev = flight;
                 toPlan.add(flight);
             }

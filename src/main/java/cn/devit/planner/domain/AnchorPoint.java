@@ -18,9 +18,9 @@ import cn.devit.planner.Plane;
 @PlanningEntity
 public abstract class AnchorPoint extends Entity {
 
-    @InverseRelationShadowVariable(sourceVariableName = "previousLeg")
     FlightLeg nextFlight;
 
+    @InverseRelationShadowVariable(sourceVariableName = "previousLeg")
     public FlightLeg getNextFlight() {
         return nextFlight;
     }

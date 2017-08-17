@@ -4,7 +4,7 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 
 import cn.devit.planner.Plane;
 
-@PlanningEntity
+//@PlanningEntity
 public final class Cancel extends AnchorPoint {
 
     @Override

@@ -130,16 +130,16 @@ public class FlightLeg extends AnchorPoint {
     Plane plane;
 
     //    @InverseRelationShadowVariable(sourceVariableName = "previousLeg")
-    FlightLeg nextLeg;
-
-    @Override
-    public FlightLeg getNextFlight() {
-        return nextLeg;
-    }
-
-    public void setNextFlight(FlightLeg nextLeg) {
-        this.nextLeg = nextLeg;
-    }
+//    FlightLeg nextLeg;
+//
+//    @Override
+//    public FlightLeg getNextFlight() {
+//        return nextLeg;
+//    }
+//
+//    public void setNextFlight(FlightLeg nextLeg) {
+//        this.nextLeg = nextLeg;
+//    }
 
     /**
      * 重要系数。

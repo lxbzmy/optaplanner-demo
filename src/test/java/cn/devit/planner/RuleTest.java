@@ -47,7 +47,7 @@ public class RuleTest {
         sc.arriavalTime = new LocalTime("17:20");
         f2.reset(sc);
 
-        f1.nextLeg = f2;
+        f1.setNextFlight(f2);
         f2.previousLeg = f1;
 
         f2.departureAirportArrivalTime = f1.getArrivalDateTime();
@@ -90,7 +90,7 @@ public class RuleTest {
         sc.arriavalTime = new LocalTime("23:10");
         f2.reset(sc);
 
-        f1.nextLeg = f2;
+        f1.setNextFlight(f2);
         f2.previousLeg = f1;
 
         f2.departureAirportArrivalTime = f1.getArrivalDateTime();

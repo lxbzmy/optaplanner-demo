@@ -74,7 +74,7 @@ public class ArrivalTimeUpdatingVariableListener
 
         while (flight != null) {
             arrivalDateTime = flight.getArrivalDateTime();
-            flight = flight.nextLeg;
+            flight = flight.getNextFlight();
             if (flight != null) {
                 scoreDirector.beforeVariableChanged(flight,
                         "departureAirportArrivalTime");

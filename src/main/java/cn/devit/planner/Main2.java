@@ -124,7 +124,7 @@ public class Main2 {
         List<AnchorPoint> anchors = plan.anchors;
         for (FlightLeg f : plan.flights) {
             if(!(f.getPreviousLeg() instanceof FlightLeg)){
-                sb.append(f.getPreviousLeg());
+                sb.append(f.getPreviousLeg()).append("\n");
                 FlightLeg start = f;
                 int seq = 1;
                 while (start != null) {
@@ -132,7 +132,7 @@ public class Main2 {
                     .append(String.format("%4d#", count++))
                     .append(String.format("%4d ", seq++)).append(start)
                     .append("\n");
-                    start = start.nextLeg;
+                    start = start.getNextFlight();
                 }
             }
         }

@@ -38,15 +38,6 @@ public class FlightLegComparatorTest {
     }
     
     @Test
-    public void null_first() throws Exception {
-        int result = new FlightLegComparator().compare(new NullFlightLeg(), new FlightLeg());
-        assertThat(result, is(-1));
-
-        result = new FlightLegComparator().compare( new FlightLeg(),new NullFlightLeg());
-        assertThat(result, is(1));
-    }
-
-    @Test
     public void compare_weight() throws Exception {
         FlightLeg flightLeg = new FlightLeg();
         flightLeg.weight = 1;

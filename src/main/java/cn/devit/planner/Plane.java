@@ -14,8 +14,11 @@ import cn.devit.planner.domain.AnchorPoint;
  * @author lxb
  *
  */
-@PlanningEntity
+//@PlanningEntity
 public class Plane extends AnchorPoint {
+    
+    private Plane() {
+    }
 
     /**
      * 机型，机型衡量载客能力。
