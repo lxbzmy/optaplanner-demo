@@ -66,8 +66,8 @@
     <forager>
       <acceptedCountLimit>100</acceptedCountLimit>
     </forager>
-    <!-- <termination>
+    <termination>
       <unimprovedMillisecondsSpentLimit>8000</unimprovedMillisecondsSpentLimit>
-    </termination> -->
+    </termination>
   </localSearch>
 </solver>

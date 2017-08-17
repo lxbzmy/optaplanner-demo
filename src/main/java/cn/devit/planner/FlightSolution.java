@@ -61,6 +61,8 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
 
     ArrayList<AirportCloseTime> airportCloseTime = new ArrayList<AirportCloseTime>();
 
+    public List<UnScheduleFlight> unScheduleList;
+
     @Override
     public Score<HardSoftScore> getScore() {
         return score;

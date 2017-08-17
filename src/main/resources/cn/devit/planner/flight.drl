@@ -245,5 +245,5 @@ rule "需要调机"
             leg.departure != $p1
         )
     then
-        scoreHolder.addHardConstraintMatch(kcontext, -5000);
+        scoreHolder.addSoftConstraintMatch(kcontext, -5000);
 end

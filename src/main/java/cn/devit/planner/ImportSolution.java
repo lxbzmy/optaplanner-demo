@@ -102,6 +102,35 @@ public class ImportSolution implements SolutionFileIO<FlightSolution> {
                 e.printStackTrace();
             }
         }
+        
+        List<UnScheduleFlight> list = new ArrayList<UnScheduleFlight>();
+        if(plan.unScheduleList!=null) {
+            list.addAll(plan.unScheduleList);
+        }
+        int num = 9001;
+        for (UnScheduleFlight f : list) {
+            String[] content = new String[9];
+            content[0] = String.valueOf(num++);
+            content[1] = f.leg.departure.id;
+            content[2] = f.leg.arrival.id;
+            content[3] = format.format(f.departureDateTime.toDate());
+
+            content[4] = format.format(f.arrivalDateTime.toDate());
+            content[5] = f.plane.id;
+            //            content[6] = resultFlight.isCancel() ? "1" : "0";
+            //            content[7] = resultFlight.isStraighten() ? "1" : "0";
+            //            content[8] = resultFlight.isEmptyFly() ? "1" : "0";
+            content[6] = "0";
+            content[7] = "0";
+            content[8] = "1";
+
+            try {
+                csvWriter.writeRecord(content);
+            } catch (IOException e) {
+                System.out.println("写CSV文件失败");
+                e.printStackTrace();
+            }
+        }
         csvWriter.close();
     }
 

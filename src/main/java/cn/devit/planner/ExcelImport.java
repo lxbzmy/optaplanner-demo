@@ -113,9 +113,9 @@ public class ExcelImport {
             sc.arriavalTime = arrival.toLocalTime();
             flight.reset(sc);
             list.add(flight);
-            scheduleFlightTimeTable.row(sc.leg).put(sc.plane, sc.getFlyTime());
-            flightModelTimeTable.row(sc.leg).put(sc.plane.model,
-                    sc.getFlyTime());
+//            scheduleFlightTimeTable.row(sc.leg).put(sc.plane, sc.getFlyTime());
+//            flightTimeTable.row(sc.leg).put(sc.plane.model,
+//                    sc.getFlyTime());
         }
         //        System.out.println("航班总数：" + list.size());
 
@@ -195,29 +195,29 @@ public class ExcelImport {
     /**
      * 表一中，计划好的飞行时间。
      */
-    static Table<Leg, Plane, Duration> scheduleFlightTimeTable = Tables
-            .newCustomTable(Maps.<Leg, Map<Plane, Duration>> newLinkedHashMap(),
-                    new Supplier<Map<Plane, Duration>>() {
-                        public Map<Plane, Duration> get() {
-                            return Maps.newLinkedHashMap();
-                        }
-                    });
+//    static Table<Leg, Plane, Duration> scheduleFlightTimeTable = Tables
+//            .newCustomTable(Maps.<Leg, Map<Plane, Duration>> newLinkedHashMap(),
+//                    new Supplier<Map<Plane, Duration>>() {
+//                        public Map<Plane, Duration> get() {
+//                            return Maps.newLinkedHashMap();
+//                        }
+//                    });
     /**
      * 表一中，按照机型查询的时间表
      */
-    static Table<Leg, String, Duration> flightModelTimeTable = Tables
-            .newCustomTable(
-                    Maps.<Leg, Map<String, Duration>> newLinkedHashMap(),
-                    new Supplier<Map<String, Duration>>() {
-                        public Map<String, Duration> get() {
-                            return Maps.newLinkedHashMap();
-                        }
-                    });
+//    static final Table<Leg, String, Duration> flightModelTimeTable = Tables
+//            .newCustomTable(
+//                    Maps.<Leg, Map<String, Duration>> newLinkedHashMap(),
+//                    new Supplier<Map<String, Duration>>() {
+//                        public Map<String, Duration> get() {
+//                            return Maps.newLinkedHashMap();
+//                        }
+//                    });
 
     /**
      * 给调飞机用的飞行时间表。
      */
-    static Table<Leg, String, Duration> flightTimeTable = Tables.newCustomTable(
+    static final Table<Leg, String, Duration> flightTimeTable = Tables.newCustomTable(
             Maps.<Leg, Map<String, Duration>> newLinkedHashMap(),
             new Supplier<Map<String, Duration>>() {
                 public Map<String, Duration> get() {
@@ -246,10 +246,11 @@ public class ExcelImport {
             row.getCell(飞行时间).getRawValue();
             Duration minutes = Duration.standardMinutes(
                     (long) row.getCell(飞行时间).getNumericCellValue());
-            //            System.out.println("⌛" + leg + " " + mod + " "
-            //                    + minutes.getStandardMinutes() + "分钟");
+//                        System.out.println("⌛" + leg + " " + mod + " "
+//                                + minutes.getStandardMinutes() + "分钟");
             flightTimeTable.row(leg).put(mod, minutes);
         }
+//        System.out.println(flightTimeTable);
 
     }
 

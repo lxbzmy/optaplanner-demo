@@ -3,6 +3,7 @@ package cn.devit.planner;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import cn.devit.planner.domain.AnchorPoint;
 
 public class Main2 {
 
-    static File file = new File("doc/厦航大赛数据_飞机30.xlsx");
+    static File file = new File("doc/厦航大赛数据_飞机XX.xlsx");
 
     /**
      * 
@@ -50,8 +51,8 @@ public class Main2 {
         // Display the result
         System.out.println("\nResult:\n");
         System.out.println(toString(plan));
-        填补空飞(solver,plan);
-
+        List<UnScheduleFlight> list = 填补空飞(solver,plan);
+        plan.unScheduleList = list;
         importSolution.write(plan, new File("doc/result.csv"));
         runScore();
         debug(solver, plan);
@@ -61,7 +62,10 @@ public class Main2 {
     final static int LV_HARD = 0;
     final int LV_SOFT = 1;
 
-    static void 填补空飞(Solver<FlightSolution> solver, FlightSolution plan) {
+    static List<UnScheduleFlight> 填补空飞(Solver<FlightSolution> solver, FlightSolution plan) {
+        
+        List<UnScheduleFlight> list = new ArrayList<UnScheduleFlight>();
+        
         ScoreDirector<FlightSolution> scoreDirector = solver
                 .getScoreDirectorFactory().buildScoreDirector();
         scoreDirector.setWorkingSolution(plan);
@@ -75,34 +79,35 @@ public class Main2 {
                 for (ConstraintMatch ii : set) {
                     List<Object> justificationList = ii.getJustificationList();
                     FlightLeg left = (FlightLeg) justificationList.get(0);
-                    FlightLeg right = left.getNextFlight();
+                    FlightLeg right = (FlightLeg) justificationList.get(1);
+                    if(left.getNextFlight() == right) {
+                        
+                    }else {
+                        left = right;
+                        right = left.getNextFlight();
+                    }
                     Leg leg = new Leg(left.getLeg().getArrival(),right.getLeg().getDeparture());
-                    FlightSchedule2 schedule = new FlightSchedule2();
-                    schedule.leg = leg;
                     DateTime dep = new DateTime(left.getArrivalDateTime().plusMinutes(50));
-                    Map<String, Duration> row = ExcelImport.flightModelTimeTable.row(leg);
+                    Map<String, Duration> row = ExcelImport.flightTimeTable.row(leg);
                     if(row.containsKey(left.plane.model)) {
                         Duration duration = row.get(left.plane.model);
-                        schedule.flightNumber ="XX";
-                        schedule.plane = left.plane;
-                        schedule.departureDate = dep.toLocalDate();
-                        schedule.departureTime = dep.toLocalTime();
-                        DateTime arr = dep.plus(duration);
-                        schedule.arriavalDate=arr.toLocalDate();
-                        schedule.arriavalTime = arr.toLocalTime();
                         
-//                        FlightLeg fixLeg = new FlightLeg();
-//                        fixLeg.reset(schedule);
-//                        fixLeg.setPreviousLeg(left);
-//                        left.setNextFlight(fixLeg);
-                        System.out.println(schedule);
+                        UnScheduleFlight flight = new UnScheduleFlight();
+                        flight.plane =  left.plane;
+                        flight.departureDateTime = dep;
+                        flight.leg = leg;
+                        flight.arrivalDateTime = dep.plus(duration);
+                        flight.emptyFlight  = true;
+                        list.add(flight);
+                        System.out.println(flight);
                     }else {
-                        Log.d("航段无法调机直飞{},{}",left,right);
+                        Log.d("航段无法调机直飞：{},{}",left,right);
                     }
                    
                 }
             }
         }
+        return list;
     }
 
     static void debug(Solver<FlightSolution> solver, FlightSolution plan) {
