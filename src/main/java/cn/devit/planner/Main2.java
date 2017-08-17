@@ -5,8 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.constraint.ConstraintMatch;
 import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
@@ -20,7 +24,7 @@ import cn.devit.planner.domain.AnchorPoint;
 
 public class Main2 {
 
-    static File file = new File("doc/厦航大赛数据_飞机40.xlsx");
+    static File file = new File("doc/厦航大赛数据_飞机30.xlsx");
 
     /**
      * 
@@ -46,6 +50,7 @@ public class Main2 {
         // Display the result
         System.out.println("\nResult:\n");
         System.out.println(toString(plan));
+        填补空飞(solver,plan);
 
         importSolution.write(plan, new File("doc/result.csv"));
         runScore();
@@ -69,7 +74,32 @@ public class Main2 {
                         .getConstraintMatchSet();
                 for (ConstraintMatch ii : set) {
                     List<Object> justificationList = ii.getJustificationList();
-                    //                    FlightLeg FlightLeg = justificationList.get(0);
+                    FlightLeg left = (FlightLeg) justificationList.get(0);
+                    FlightLeg right = left.getNextFlight();
+                    Leg leg = new Leg(left.getLeg().getArrival(),right.getLeg().getDeparture());
+                    FlightSchedule2 schedule = new FlightSchedule2();
+                    schedule.leg = leg;
+                    DateTime dep = new DateTime(left.getArrivalDateTime().plusMinutes(50));
+                    Map<String, Duration> row = ExcelImport.flightModelTimeTable.row(leg);
+                    if(row.containsKey(left.plane.model)) {
+                        Duration duration = row.get(left.plane.model);
+                        schedule.flightNumber ="XX";
+                        schedule.plane = left.plane;
+                        schedule.departureDate = dep.toLocalDate();
+                        schedule.departureTime = dep.toLocalTime();
+                        DateTime arr = dep.plus(duration);
+                        schedule.arriavalDate=arr.toLocalDate();
+                        schedule.arriavalTime = arr.toLocalTime();
+                        
+//                        FlightLeg fixLeg = new FlightLeg();
+//                        fixLeg.reset(schedule);
+//                        fixLeg.setPreviousLeg(left);
+//                        left.setNextFlight(fixLeg);
+                        System.out.println(schedule);
+                    }else {
+                        Log.d("航段无法调机直飞{},{}",left,right);
+                    }
+                   
                 }
             }
         }
@@ -80,7 +110,8 @@ public class Main2 {
         ScoreDirector<FlightSolution> scoreDirector = solver
                 .getScoreDirectorFactory().buildScoreDirector();
         scoreDirector.setWorkingSolution(plan);
-        scoreDirector.calculateScore();
+        Score score = scoreDirector.calculateScore();
+        Log.d("分数{}", score);
         Collection<ConstraintMatchTotal> inv = scoreDirector
                 .getConstraintMatchTotals();
         for (ConstraintMatchTotal item : inv) {

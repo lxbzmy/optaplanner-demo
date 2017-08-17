@@ -30,7 +30,7 @@ rule "测试"
 end
 */
 /* 常理 */
-/*没用，链式的时间顺序会自动调整的。
+/*如果不能调整时间时需要这个限制*/
 rule "前后时间顺序不能乱"
     when
         $f1: FlightLeg(plane !=null, $arrivalDateTime: arrivalDateTime)
@@ -38,7 +38,7 @@ rule "前后时间顺序不能乱"
     then
         scoreHolder.addHardConstraintMatch(kcontext, -1000000);
 end
-*/
+
 /*TODO 这个规则可能会导致不能取消。
 TODO 台风影响的飞机能够提前
 TODO 空飞，调机
@@ -208,7 +208,13 @@ rule "右边界不能取消或者空飞"
     then 
         scoreHolder.addHardConstraintMatch(kcontext, -10000);    
 end
-//TODO "左边界不能改变机场"
+rule "左边界不能取消"
+    when 
+        $flight : FlightLeg(plane ==null)
+        $right: Edge(type == EdgeType.left, this contains $flight )
+    then 
+        scoreHolder.addHardConstraintMatch(kcontext, -10000);    
+end
 
 
 
