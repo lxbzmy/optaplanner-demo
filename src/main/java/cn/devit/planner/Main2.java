@@ -69,7 +69,7 @@ public class Main2 {
                         .getConstraintMatchSet();
                 for (ConstraintMatch ii : set) {
                     List<Object> justificationList = ii.getJustificationList();
-//                    FlightLeg FlightLeg = justificationList.get(0);
+                    //                    FlightLeg FlightLeg = justificationList.get(0);
                 }
             }
         }
@@ -122,18 +122,16 @@ public class Main2 {
         int count = 1;
         StringBuilder sb = new StringBuilder();
         List<AnchorPoint> anchors = plan.anchors;
-        for (FlightLeg f : plan.flights) {
-            if(!(f.getPreviousLeg() instanceof FlightLeg)){
-                sb.append(f.getPreviousLeg()).append("\n");
-                FlightLeg start = f;
-                int seq = 1;
-                while (start != null) {
-                    sb.append((start.changed() ? "!" : " "))
-                    .append(String.format("%4d#", count++))
-                    .append(String.format("%4d ", seq++)).append(start)
-                    .append("\n");
-                    start = start.getNextFlight();
-                }
+        for (AnchorPoint f : anchors) {
+            sb.append(f).append("\n");
+            FlightLeg start = f.getNextFlight();
+            int seq = 1;
+            while (start != null) {
+                sb.append((start.changed() ? "!" : " "))
+                        .append(String.format("%4d#", count++))
+                        .append(String.format("%4d ", seq++)).append(start)
+                        .append("\n");
+                start = start.getNextFlight();
             }
         }
         return sb.toString();

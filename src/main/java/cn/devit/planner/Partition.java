@@ -10,6 +10,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
 import cn.devit.planner.Edge.EdgeType;
+import cn.devit.planner.domain.AnchorPoint;
+import cn.devit.planner.domain.Cancel;
 
 public class Partition implements SolutionPartitioner<FlightSolution> {
 
@@ -41,9 +43,9 @@ public class Partition implements SolutionPartitioner<FlightSolution> {
             partSolution.right = new Edge(EdgeType.right);
             partSolution.right
                     .addAll(Collections2.filter(rootSolution.right, filter));
-            partSolution.startLegs = new ArrayList<>();
-            partSolution.startLegs.add(item);
-            partSolution.startLegs.add(new NullFlightLeg());
+            List<AnchorPoint> anchors = new ArrayList<>();
+            anchors.add(item.getPlane());
+            anchors.add(new Cancel());
 
             partSolution.flights = new ArrayList<>(
                     Collections2.filter(rootSolution.flights, filter));
