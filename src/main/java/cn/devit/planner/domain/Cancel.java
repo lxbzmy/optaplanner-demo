@@ -6,6 +6,18 @@ import cn.devit.planner.Plane;
 
 //@PlanningEntity
 public final class Cancel extends AnchorPoint {
+    
+    public Cancel() {
+    }
+    
+    public Cancel(String id) {
+        this.setId(id);
+    }
+    
+    @Override
+    public String getId() {
+        return super.getId();
+    }
 
     @Override
     public Plane getPlane() {

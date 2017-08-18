@@ -31,6 +31,8 @@ public class Partition implements SolutionPartitioner<FlightSolution> {
         
         List<FlightSolution> parts = new ArrayList<FlightSolution>();
         for (FlightLeg item : rootSolution.left) {
+            Log.d("方案分区{}", item.plane);
+            Plane plane = (Plane) item.plane.getNextFlight().getPlane();
 
             Predicate<FlightLeg> filter = new Predicate<FlightLeg>() {
                 @Override
@@ -44,13 +46,14 @@ public class Partition implements SolutionPartitioner<FlightSolution> {
             partSolution.right
                     .addAll(Collections2.filter(rootSolution.right, filter));
             List<AnchorPoint> anchors = new ArrayList<>();
-            anchors.add(item.getPlane());
-            anchors.add(new Cancel());
+            anchors.add(plane);
+            anchors.add(new Cancel(plane.getId()));
+            partSolution.anchors = anchors;
 
             partSolution.flights = new ArrayList<>(
                     Collections2.filter(rootSolution.flights, filter));
             partSolution.planes = new ArrayList<>();
-            partSolution.planes.add(item.plane);
+            partSolution.planes.add(plane);
             parts.add(partSolution);
         }
         return parts;

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.optaplanner.core.api.domain.lookup.LookUpStrategyType;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.Solution;
@@ -23,8 +24,9 @@ import cn.devit.planner.constraints.AirportCloseTime;
 import cn.devit.planner.constraints.PlaneLegConstraint;
 import cn.devit.planner.constraints.Weather;
 import cn.devit.planner.domain.AnchorPoint;
+import cn.devit.planner.domain.FlyTime;
 
-@PlanningSolution
+@PlanningSolution()
 public class FlightSolution implements Solution<Score<HardSoftScore>> {
 
     @ValueRangeProvider(id = "plane")
@@ -63,6 +65,8 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
 
     public List<UnScheduleFlight> unScheduleList;
 
+    public List<FlyTime> flyTime = new ArrayList<>();
+
     @Override
     public Score<HardSoftScore> getScore() {
         return score;
@@ -82,6 +86,9 @@ public class FlightSolution implements Solution<Score<HardSoftScore>> {
         //限制条件，天气，机场关闭
         set.addAll(airportCloseTime);
         set.addAll(weathers);
+        
+        //
+        set.addAll(flyTime);
 
         //变量
         //日期，时间

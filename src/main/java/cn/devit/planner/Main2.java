@@ -148,7 +148,7 @@ public class Main2 {
                     .start();
             InputStream inputStream = proc.getInputStream();
             byte[] byteArray = ByteStreams.toByteArray(inputStream);
-            System.out.println(new String(byteArray, "UTF-8"));
+            System.out.println(new String(byteArray));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

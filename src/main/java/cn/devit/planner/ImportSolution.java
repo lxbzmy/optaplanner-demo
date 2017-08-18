@@ -6,16 +6,20 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.joda.time.Duration;
 import org.optaplanner.persistence.common.api.domain.solution.SolutionFileIO;
 
 import com.csvreader.CsvWriter;
+import com.google.common.collect.Table.Cell;
 
 import cn.devit.planner.constraints.AirportCloseTime;
 import cn.devit.planner.constraints.PlaneLegConstraint;
 import cn.devit.planner.constraints.Weather;
 import cn.devit.planner.domain.AnchorPoint;
 import cn.devit.planner.domain.Cancel;
+import cn.devit.planner.domain.FlyTime;
 
 public class ImportSolution implements SolutionFileIO<FlightSolution> {
 
@@ -40,6 +44,7 @@ public class ImportSolution implements SolutionFileIO<FlightSolution> {
         }
 
         FlightSolution plan = new FlightSolution();
+        
         plan.legs = new ArrayList<Leg>(excelImport.legs.values());
         plan.planes = new ArrayList<Plane>(excelImport.planes.values());
 
@@ -56,13 +61,23 @@ public class ImportSolution implements SolutionFileIO<FlightSolution> {
         for (FlightLeg item : excelImport.left) {
             anchors.add(item.plane);
         }
-        anchors.add(new Cancel());
+        anchors.add(new Cancel("XX"));
         plan.anchors = anchors;
 
         System.out.println("起始点：" + (excelImport.left.size()));
         plan.left = excelImport.left;
         plan.right = excelImport.right;
-
+        
+        //空飞的飞行时间
+        
+        
+        
+        List<FlyTime> list = new ArrayList<FlyTime>();
+        Set<Cell<Leg, String, Duration>> cellSet = excelImport.flightTimeTable.cellSet();
+        for (Cell<Leg, String, Duration> cell : cellSet) {
+            list.add(new FlyTime(cell.getColumnKey(), cell.getRowKey(), cell.getValue()));
+        }
+        plan.flyTime = list;
         return plan;
 
     }

@@ -46,7 +46,7 @@ public class FlightLeg extends AnchorPoint {
         setId(id);
     }
 
-    @PlanningId
+//    @PlanningId
     @Override
     public String getId() {
         return super.getId();

@@ -14,6 +14,7 @@ import cn.devit.planner.Airport
 import cn.devit.planner.constraints.AirportCloseTime
 import cn.devit.planner.Edge.EdgeType
 import cn.devit.planner.Edge
+import cn.devit.planner.domain.FlyTime;
 
 global HardSoftScoreHolder scoreHolder;
 
@@ -52,7 +53,12 @@ rule "航站要衔接但允许空飞调机"
             leg.departure != $p1,$p2:leg.departure,
             $p:plane
             )
-        PlaneLegConstraint( leg.departure==$p1 , leg.arrival== $p2 , plane == $p )
+        $plane :Plane( this == $p )    
+        ( PlaneLegConstraint( leg.departure==$p1 , leg.arrival== $p2 , plane == $p )
+        or
+          not ( exists FlyTime(leg.departure==$p1 , leg.arrival== $p2, model == $plane.model ) )
+        )
+        
     then
         scoreHolder.addHardConstraintMatch(kcontext, -100);
 end

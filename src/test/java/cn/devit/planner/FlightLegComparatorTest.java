@@ -7,7 +7,32 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 
+import cn.devit.planner.domain.Cancel;
+
 public class FlightLegComparatorTest {
+    
+    @Test
+    public void cancel_first() throws Exception {
+        Cancel c = new Cancel();
+        Plane p = new Plane("1");
+        FlightLeg flight = new FlightLeg();
+        int result = new FlightLegComparator().compare(c, p);
+        assertThat(result, is(-1));
+        result = new FlightLegComparator().compare(c, flight);
+        assertThat(result, is(-1));
+        
+        result = new FlightLegComparator().compare(p, c);
+        assertThat(result, is(1));
+
+    }
+    
+    @Test
+    public void plane_eq() throws Exception {
+        Plane p1 = new Plane("1");
+        Plane p2 = new Plane("1");
+        int result = new FlightLegComparator().compare(p1, p2);
+        assertThat(result, is(0));
+    }
 
     @Test
     public void compare() throws Exception {

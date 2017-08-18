@@ -1,5 +1,7 @@
 package cn.devit.planner;
 
+import org.optaplanner.core.api.domain.lookup.PlanningId;
+
 /**
  * We Entity only has ID.
  * <p>
@@ -16,7 +18,7 @@ public abstract class Entity {
         this.id = id.trim();
     }
     
-    
+    @PlanningId
     public String getId() {
         return id;
     }

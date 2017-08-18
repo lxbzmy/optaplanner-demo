@@ -47,4 +47,8 @@ public class Plane extends AnchorPoint {
     public Plane getPlane() {
         return this;
     }
+ 
+    public String getModel() {
+        return model;
+    }
 }

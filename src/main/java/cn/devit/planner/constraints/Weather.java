@@ -92,4 +92,51 @@ public final class Weather {
         return "💨(" + airport + " " + affect + " " + form + " " + thru + ")";
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((affect == null) ? 0 : affect.hashCode());
+        result = prime * result + ((airport == null) ? 0 : airport.hashCode());
+        result = prime * result + ((form == null) ? 0 : form.hashCode());
+        result = prime * result + ((thru == null) ? 0 : thru.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Weather other = (Weather) obj;
+        if (affect != other.affect)
+            return false;
+        if (airport == null) {
+            if (other.airport != null)
+                return false;
+        } else if (!airport.equals(other.airport))
+            return false;
+        if (form == null) {
+            if (other.form != null)
+                return false;
+        } else if (!form.equals(other.form))
+            return false;
+        if (thru == null) {
+            if (other.thru != null)
+                return false;
+        } else if (!thru.equals(other.thru))
+            return false;
+        return true;
+    }
+
+    
 }
