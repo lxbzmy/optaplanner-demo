@@ -25,7 +25,7 @@ import cn.devit.planner.domain.AnchorPoint;
 
 public class Main2 {
 
-    static File file = new File("doc/厦航大赛数据_飞机XX.xlsx");
+    static File file = new File("doc/厦航大赛数据_飞机40.xlsx");
 
     /**
      * 
